@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router";
 
 interface SidebarProps {
-  role: "student" | "teacher";
+  role: "student" | "faculty";
   items: Array<{
     icon: LucideIcon;
     label: string;

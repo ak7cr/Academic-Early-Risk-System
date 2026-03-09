@@ -7,12 +7,12 @@ import { TopNavbar } from "../components/TopNavbar";
 import { RiskBadge } from "../components/RiskBadge";
 import { useNavigate } from "react-router";
 
-const teacherSidebar = [
-  { icon: LayoutDashboard, label: "Overview", path: "/teacher/dashboard" },
-  { icon: Users, label: "Students", path: "/teacher/students" },
-  { icon: BarChart3, label: "Class Analytics", path: "/teacher/analytics" },
-  { icon: FileText, label: "Reports", path: "/teacher/reports" },
-  { icon: Settings, label: "Settings", path: "/teacher/settings" },
+const facultySidebar = [
+  { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
+  { icon: Users, label: "Students", path: "/faculty/students" },
+  { icon: BarChart3, label: "Class Analytics", path: "/faculty/analytics" },
+  { icon: FileText, label: "Reports", path: "/faculty/reports" },
+  { icon: Settings, label: "Settings", path: "/faculty/settings" },
 ];
 
 const students = [
@@ -23,12 +23,12 @@ const students = [
   { id: 5, name: "Emma Wilson", email: "emma.wilson@university.edu", studentId: "2024005", risk: "medium" as const, completion: 78, missed: 1, workload: 4.5 },
 ];
 
-export function TeacherDashboard() {
+export function FacultyDashboard() {
   const navigate = useNavigate();
 
   return (
     <div className="flex h-screen bg-[#F9FAFB]">
-      <Sidebar role="teacher" items={teacherSidebar} />
+      <Sidebar role="faculty" items={facultySidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar title="Dashboard" subtitle="Real-time Academic Health Monitoring" userName="Dr. Sarah Johnson" />
@@ -40,7 +40,7 @@ export function TeacherDashboard() {
               <div
                 key={student.id}
                 className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/teacher/student/${student.id}`)}
+                onClick={() => navigate(`/faculty/student/${student.id}`)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-1">
@@ -93,7 +93,7 @@ export function TeacherDashboard() {
                   </div>
 
                   <button
-                    onClick={(e) => { e.stopPropagation(); navigate(`/teacher/student/${student.id}`); }}
+                    onClick={(e) => { e.stopPropagation(); navigate(`/faculty/student/${student.id}`); }}
                     className="px-5 py-2.5 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1d4ed8] transition-colors"
                   >
                     View Details

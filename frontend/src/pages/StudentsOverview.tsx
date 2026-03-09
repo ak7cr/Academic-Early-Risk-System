@@ -9,12 +9,12 @@ import { RiskBadge } from "../components/RiskBadge";
 import { AlertBanner } from "../components/AlertBanner";
 import { useNavigate } from "react-router";
 
-const teacherSidebar = [
-  { icon: LayoutDashboard, label: "Overview", path: "/teacher/dashboard" },
-  { icon: Users, label: "Students", path: "/teacher/students" },
-  { icon: BarChart3, label: "Class Analytics", path: "/teacher/analytics" },
-  { icon: FileText, label: "Reports", path: "/teacher/reports" },
-  { icon: Settings, label: "Settings", path: "/teacher/settings" },
+const facultySidebar = [
+  { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
+  { icon: Users, label: "Students", path: "/faculty/students" },
+  { icon: BarChart3, label: "Class Analytics", path: "/faculty/analytics" },
+  { icon: FileText, label: "Reports", path: "/faculty/reports" },
+  { icon: Settings, label: "Settings", path: "/faculty/settings" },
 ];
 
 const students = [
@@ -30,7 +30,7 @@ export function StudentsOverview() {
 
   return (
     <div className="flex h-screen bg-[#F9FAFB]">
-      <Sidebar role="teacher" items={teacherSidebar} />
+      <Sidebar role="faculty" items={facultySidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar title="Students" subtitle="Monitor all students in your class" userName="Dr. Sarah Johnson" />
@@ -106,7 +106,7 @@ export function StudentsOverview() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{s.workload}/10</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
-                          onClick={() => navigate(`/teacher/student/${s.id}`)}
+                          onClick={() => navigate(`/faculty/student/${s.id}`)}
                           className="px-4 py-2 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1d4ed8] transition-colors"
                         >
                           View Details

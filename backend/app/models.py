@@ -13,7 +13,7 @@ def _utcnow():
 
 class UserRole(str, enum.Enum):
     student = "student"
-    teacher = "teacher"
+    faculty = "faculty"
 
 
 class TaskStatus(str, enum.Enum):

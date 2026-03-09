@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import User, UserRole, Task, TaskStatus
 from ..schemas import WeeklyReport
-from ..auth import get_current_user, require_teacher
+from ..auth import get_current_user, require_faculty
 from ..risk_engine import _classify, _build_recommendations
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
@@ -54,9 +54,9 @@ def get_weekly_report(
 def get_student_weekly_report(
     student_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_teacher),
+    current_user: User = Depends(require_faculty),
 ):
-    """Get weekly report for a specific student (teacher only)."""
+    """Get weekly report for a specific student (faculty only)."""
     student = db.query(User).filter(User.id == student_id, User.role == UserRole.student).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")

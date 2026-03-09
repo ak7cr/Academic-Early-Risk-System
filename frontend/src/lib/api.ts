@@ -39,7 +39,7 @@ export interface User {
   id: number;
   email: string;
   name: string;
-  role: "student" | "teacher";
+  role: "student" | "faculty";
   student_id: string | null;
   department: string | null;
   year: number | null;
@@ -140,7 +140,7 @@ export const tasksApi = {
   delete: (id: number) => api.delete<void>(`/api/tasks/${id}`),
 };
 
-// --- Students (teacher) ---
+// --- Students (faculty) ---
 export interface StudentSummary {
   id: number;
   name: string;

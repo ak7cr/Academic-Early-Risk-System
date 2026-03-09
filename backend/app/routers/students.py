@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import User, UserRole, Task, TaskStatus
 from ..schemas import StudentSummary, RiskResult
-from ..auth import require_teacher
+from ..auth import require_faculty
 from ..risk_engine import compute_risk, compute_trends, compute_subject_risk
 
 router = APIRouter(prefix="/api/students", tags=["students"])
@@ -13,9 +13,9 @@ router = APIRouter(prefix="/api/students", tags=["students"])
 @router.get("", response_model=list[StudentSummary])
 def list_students(
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_teacher),
+    current_user: User = Depends(require_faculty),
 ):
-    """List all students with their risk metrics (teacher only)."""
+    """List all students with their risk metrics (faculty only)."""
     students = db.query(User).filter(User.role == UserRole.student).all()
     results = []
 
@@ -50,7 +50,7 @@ def list_students(
 def get_student(
     student_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_teacher),
+    current_user: User = Depends(require_faculty),
 ):
     student = db.query(User).filter(User.id == student_id, User.role == UserRole.student).first()
     if not student:
@@ -85,7 +85,7 @@ def get_student(
 def get_student_risk(
     student_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_teacher),
+    current_user: User = Depends(require_faculty),
 ):
     student = db.query(User).filter(User.id == student_id, User.role == UserRole.student).first()
     if not student:
@@ -97,7 +97,7 @@ def get_student_risk(
 def get_student_trends(
     student_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_teacher),
+    current_user: User = Depends(require_faculty),
 ):
     student = db.query(User).filter(User.id == student_id, User.role == UserRole.student).first()
     if not student:
@@ -109,7 +109,7 @@ def get_student_trends(
 def get_student_subjects(
     student_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_teacher),
+    current_user: User = Depends(require_faculty),
 ):
     student = db.query(User).filter(User.id == student_id, User.role == UserRole.student).first()
     if not student:

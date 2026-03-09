@@ -2,18 +2,18 @@ import { LayoutDashboard, Users, BarChart3, FileText, Settings } from "lucide-re
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
 
-const teacherSidebar = [
-  { icon: LayoutDashboard, label: "Overview", path: "/teacher/dashboard" },
-  { icon: Users, label: "Students", path: "/teacher/students" },
-  { icon: BarChart3, label: "Class Analytics", path: "/teacher/analytics" },
-  { icon: FileText, label: "Reports", path: "/teacher/reports" },
-  { icon: Settings, label: "Settings", path: "/teacher/settings" },
+const facultySidebar = [
+  { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
+  { icon: Users, label: "Students", path: "/faculty/students" },
+  { icon: BarChart3, label: "Class Analytics", path: "/faculty/analytics" },
+  { icon: FileText, label: "Reports", path: "/faculty/reports" },
+  { icon: Settings, label: "Settings", path: "/faculty/settings" },
 ];
 
-export function TeacherSettings() {
+export function FacultySettings() {
   return (
     <div className="flex h-screen bg-[#F9FAFB]">
-      <Sidebar role="teacher" items={teacherSidebar} />
+      <Sidebar role="faculty" items={facultySidebar} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar title="Settings" subtitle="Manage your preferences" userName="Dr. Sarah Johnson" />
         <div className="flex-1 overflow-y-auto p-8">

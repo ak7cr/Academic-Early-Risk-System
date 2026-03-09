@@ -9,22 +9,22 @@ from .auth import hash_password
 
 
 def seed_database(db: Session):
-    """Insert demo students, teacher, subjects, and tasks."""
+    """Insert demo students, faculty, subjects, and tasks."""
     # Skip if already seeded
     if db.query(User).first():
         return
 
     now = datetime.now(timezone.utc)
 
-    # Teacher
-    teacher = User(
+    # Faculty
+    faculty_user = User(
         email="sarah.johnson@university.edu",
-        password_hash=hash_password("teacher123"),
+        password_hash=hash_password("faculty123"),
         name="Dr. Sarah Johnson",
-        role=UserRole.teacher,
+        role=UserRole.faculty,
         department="Computer Science",
     )
-    db.add(teacher)
+    db.add(faculty_user)
     db.flush()
 
     # Students with varying risk profiles

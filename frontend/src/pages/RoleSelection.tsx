@@ -54,16 +54,16 @@ export function RoleSelection() {
             </div>
           </button>
 
-          {/* Teacher Card */}
+          {/* Faculty Card */}
           <button
-            onClick={() => navigate("/teacher/dashboard")}
+            onClick={() => navigate("/faculty/dashboard")}
             className="bg-white rounded-2xl p-10 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left group"
           >
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <GraduationCap className="w-8 h-8 text-[#9333EA]" strokeWidth={2} />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Teacher</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Faculty</h2>
               <p className="text-gray-600 text-sm leading-relaxed mb-6">
                 Monitor all students, view class-wide analytics, generate reports, and identify at-risk students
               </p>

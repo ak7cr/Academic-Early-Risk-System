@@ -6,10 +6,10 @@ import { StudentSubjects } from "./pages/StudentSubjects";
 import { StudentSimulator } from "./pages/StudentSimulator";
 import { StudentRecovery } from "./pages/StudentRecovery";
 import { StudentReports } from "./pages/StudentReports";
-import { TeacherDashboard } from "./pages/TeacherDashboard";
-import { TeacherAnalytics } from "./pages/TeacherAnalytics";
-import { TeacherReports } from "./pages/TeacherReports";
-import { TeacherSettings } from "./pages/TeacherSettings";
+import { FacultyDashboard } from "./pages/FacultyDashboard";
+import { FacultyAnalytics } from "./pages/FacultyAnalytics";
+import { FacultyReports } from "./pages/FacultyReports";
+import { FacultySettings } from "./pages/FacultySettings";
 import { StudentDetail } from "./pages/StudentDetail";
 import { StudentsOverview } from "./pages/StudentsOverview";
 
@@ -21,12 +21,12 @@ const router = createBrowserRouter([
   { path: "/student/simulator", Component: StudentSimulator },
   { path: "/student/recovery", Component: StudentRecovery },
   { path: "/student/reports", Component: StudentReports },
-  { path: "/teacher/dashboard", Component: TeacherDashboard },
-  { path: "/teacher/students", Component: StudentsOverview },
-  { path: "/teacher/analytics", Component: TeacherAnalytics },
-  { path: "/teacher/reports", Component: TeacherReports },
-  { path: "/teacher/settings", Component: TeacherSettings },
-  { path: "/teacher/student/:id", Component: StudentDetail },
+  { path: "/faculty/dashboard", Component: FacultyDashboard },
+  { path: "/faculty/students", Component: StudentsOverview },
+  { path: "/faculty/analytics", Component: FacultyAnalytics },
+  { path: "/faculty/reports", Component: FacultyReports },
+  { path: "/faculty/settings", Component: FacultySettings },
+  { path: "/faculty/student/:id", Component: StudentDetail },
 ]);
 
 export default function App() {

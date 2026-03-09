@@ -7,7 +7,7 @@ class UserCreate(BaseModel):
     email: str
     password: str
     name: str
-    role: str  # "student" | "teacher"
+    role: str  # "student" | "faculty"
     student_id: str | None = None
     department: str | None = None
     year: int | None = None
@@ -154,7 +154,7 @@ class SimulatorResult(BaseModel):
     projected: RiskResult
 
 
-# --- Teacher ---
+# --- Faculty ---
 class StudentSummary(BaseModel):
     id: int
     name: str

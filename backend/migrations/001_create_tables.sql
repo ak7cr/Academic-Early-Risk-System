@@ -4,7 +4,7 @@
 
 -- Enum types
 DO $$ BEGIN
-    CREATE TYPE userrole AS ENUM ('student', 'teacher');
+    CREATE TYPE userrole AS ENUM ('student', 'faculty');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
