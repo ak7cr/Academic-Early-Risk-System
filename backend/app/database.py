@@ -24,6 +24,8 @@ elif _url.startswith("postgres://"):
 
 # pg8000 needs an ssl_context for SSL connections (Supabase pooler requires SSL)
 _ssl_context = ssl.create_default_context()
+_ssl_context.check_hostname = False
+_ssl_context.verify_mode = ssl.CERT_NONE
 
 # Use NullPool for serverless (Vercel) — no persistent connection pool
 engine = create_engine(
