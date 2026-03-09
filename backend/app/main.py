@@ -33,18 +33,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS: allow localhost dev servers + any Vercel preview/production deploy
-_extra = os.environ.get(
-    "ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176",
-).split(",")
-_origins = [o.strip().rstrip("/") for o in _extra if o.strip()]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_origins,
-    allow_origin_regex=r"https://academic-early-risk-system.*\.vercel\.app",
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
