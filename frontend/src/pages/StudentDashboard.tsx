@@ -10,7 +10,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { riskApi, subjectsApi, type RiskResult, type User } from "../lib/api";
+import { riskApi, subjectsApi, type RiskResult, type TrendPoint, type BacklogPoint, type User } from "../lib/api";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/student/dashboard" },
@@ -22,8 +22,6 @@ const sidebarItems = [
 ];
 
 interface SubjectWithRisk { code: string; name: string; risk_level: string; }
-interface TrendPoint { week: string; value: number; }
-interface BacklogPoint { week: string; overdue: number; pending: number; }
 
 export function StudentDashboard() {
   const [risk, setRisk] = useState<RiskResult | null>(null);
@@ -44,9 +42,9 @@ export function StudentDashboard() {
       .then(([r, s, t]) => {
         setRisk(r);
         setSubjects(s as SubjectWithRisk[]);
-        setCompletionTrend((t as { completion_trend: TrendPoint[] }).completion_trend || []);
-        setRiskTrend((t as { risk_trend: TrendPoint[] }).risk_trend || []);
-        setBacklogTrend((t as { backlog_trend: BacklogPoint[] }).backlog_trend || []);
+        setCompletionTrend(t.completion_trend || []);
+        setRiskTrend(t.risk_trend || []);
+        setBacklogTrend(t.backlog_trend || []);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));

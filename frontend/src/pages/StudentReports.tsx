@@ -46,7 +46,7 @@ export function StudentReports() {
                   <h2 className="text-xl font-bold text-gray-900">Weekly Report</h2>
                 </div>
                 <div className="text-sm text-gray-500 mb-6">
-                  {report.week_start} — {report.week_end}
+                  {report.report_period}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
@@ -62,11 +62,11 @@ export function StudentReports() {
                   </div>
                   <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-xs text-gray-500 mb-1">Tasks Completed</p>
-                    <p className="text-lg font-bold text-green-600">{report.tasks_completed}</p>
+                    <p className="text-lg font-bold text-green-600">{report.completed_tasks}</p>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-xs text-gray-500 mb-1">Tasks Overdue</p>
-                    <p className="text-lg font-bold text-red-600">{report.tasks_overdue}</p>
+                    <p className="text-lg font-bold text-red-600">{report.missed_deadlines}</p>
                   </div>
                 </div>
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText, Loader2, Play } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
-import { riskApi, type User } from "../lib/api";
+import { riskApi, type RiskResult, type User } from "../lib/api";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/student/dashboard" },
@@ -15,17 +15,16 @@ const sidebarItems = [
 
 export function StudentSimulator() {
   const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
-  const [overdueTasks, setOverdueTasks] = useState(2);
-  const [completionRate, setCompletionRate] = useState(70);
-  const [workloadScore, setWorkloadScore] = useState(5);
-  const [result, setResult] = useState<{ risk_level: string; explanation: string[]; recommendations: string[] } | null>(null);
+  const [completeTasks, setCompleteTasks] = useState(0);
+  const [addTasks, setAddTasks] = useState(0);
+  const [result, setResult] = useState<{ current: RiskResult; projected: RiskResult } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const simulate = () => {
     setLoading(true);
     setError("");
-    riskApi.simulate({ overdue_tasks: overdueTasks, completion_rate: completionRate, workload_score: workloadScore })
+    riskApi.simulate({ complete_tasks: completeTasks, add_tasks: addTasks })
       .then(setResult)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -50,30 +49,20 @@ export function StudentSimulator() {
               <div className="space-y-6">
                 <div>
                   <div className="flex justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-700">Overdue Tasks</label>
-                    <span className="text-sm font-bold text-gray-900">{overdueTasks}</span>
+                    <label className="text-sm font-medium text-gray-700">Overdue Tasks to Complete</label>
+                    <span className="text-sm font-bold text-gray-900">{completeTasks}</span>
                   </div>
-                  <input type="range" min={0} max={10} value={overdueTasks} onChange={(e) => setOverdueTasks(Number(e.target.value))}
+                  <input type="range" min={0} max={10} value={completeTasks} onChange={(e) => setCompleteTasks(Number(e.target.value))}
                     className="w-full accent-[#2563EB]" />
                   <div className="flex justify-between text-xs text-gray-400 mt-1"><span>0</span><span>10</span></div>
                 </div>
 
                 <div>
                   <div className="flex justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-700">Completion Rate</label>
-                    <span className="text-sm font-bold text-gray-900">{completionRate}%</span>
+                    <label className="text-sm font-medium text-gray-700">New Tasks to Add</label>
+                    <span className="text-sm font-bold text-gray-900">{addTasks}</span>
                   </div>
-                  <input type="range" min={0} max={100} value={completionRate} onChange={(e) => setCompletionRate(Number(e.target.value))}
-                    className="w-full accent-[#2563EB]" />
-                  <div className="flex justify-between text-xs text-gray-400 mt-1"><span>0%</span><span>100%</span></div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-700">Workload Score</label>
-                    <span className="text-sm font-bold text-gray-900">{workloadScore}</span>
-                  </div>
-                  <input type="range" min={0} max={10} step={0.5} value={workloadScore} onChange={(e) => setWorkloadScore(Number(e.target.value))}
+                  <input type="range" min={0} max={10} value={addTasks} onChange={(e) => setAddTasks(Number(e.target.value))}
                     className="w-full accent-[#2563EB]" />
                   <div className="flex justify-between text-xs text-gray-400 mt-1"><span>0</span><span>10</span></div>
                 </div>
@@ -91,24 +80,40 @@ export function StudentSimulator() {
             {result && (
               <div className="bg-white rounded-2xl p-8 shadow-sm">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Simulation Result</h3>
-                <div className={`inline-block px-4 py-2 rounded-full text-sm font-bold mb-4 ${riskColor(result.risk_level)}`}>
-                  {result.risk_level.charAt(0).toUpperCase() + result.risk_level.slice(1)} Risk
+
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="border rounded-xl p-4">
+                    <p className="text-xs text-gray-500 mb-2">Current Risk</p>
+                    <div className={`inline-block px-3 py-1 rounded-full text-sm font-bold ${riskColor(result.current.risk_level)}`}>
+                      {result.current.risk_level.charAt(0).toUpperCase() + result.current.risk_level.slice(1)}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">Completion: {result.current.completion_rate}%</p>
+                    <p className="text-sm text-gray-600">Overdue: {result.current.overdue_tasks}</p>
+                  </div>
+                  <div className="border-2 border-[#2563EB] rounded-xl p-4">
+                    <p className="text-xs text-gray-500 mb-2">Projected Risk</p>
+                    <div className={`inline-block px-3 py-1 rounded-full text-sm font-bold ${riskColor(result.projected.risk_level)}`}>
+                      {result.projected.risk_level.charAt(0).toUpperCase() + result.projected.risk_level.slice(1)}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">Completion: {result.projected.completion_rate}%</p>
+                    <p className="text-sm text-gray-600">Overdue: {result.projected.overdue_tasks}</p>
+                  </div>
                 </div>
 
-                {result.explanation.length > 0 && (
+                {result.projected.explanation.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-sm font-semibold text-gray-700 mb-2">Analysis</p>
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Projected Analysis</p>
                     <ul className="space-y-1">
-                      {result.explanation.map((e, i) => <li key={i} className="text-sm text-gray-600">• {e}</li>)}
+                      {result.projected.explanation.map((e, i) => <li key={i} className="text-sm text-gray-600">• {e}</li>)}
                     </ul>
                   </div>
                 )}
 
-                {result.recommendations.length > 0 && (
+                {result.projected.recommendations.length > 0 && (
                   <div className="bg-blue-50 rounded-xl p-4">
                     <p className="text-sm font-semibold text-gray-800 mb-2">Recommendations</p>
                     <ul className="space-y-1">
-                      {result.recommendations.map((r, i) => <li key={i} className="text-sm text-gray-700">• {r}</li>)}
+                      {result.projected.recommendations.map((r, i) => <li key={i} className="text-sm text-gray-700">• {r}</li>)}
                     </ul>
                   </div>
                 )}

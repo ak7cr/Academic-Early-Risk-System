@@ -65,12 +65,12 @@ export function FacultyReports() {
                     </div>
                     {r ? (
                       <div>
-                        <p className="text-xs text-gray-400 mb-2">Week: {r.week_start} — {r.week_end}</p>
+                        <p className="text-xs text-gray-400 mb-2">{r.report_period}</p>
                         <div className="grid grid-cols-4 gap-3 text-sm mb-3">
                           <div className="bg-gray-50 rounded-xl p-3"><span className="text-gray-500 text-xs">Completion</span><p className="font-bold">{r.completion_rate}%</p></div>
-                          <div className="bg-gray-50 rounded-xl p-3"><span className="text-gray-500 text-xs">Completed</span><p className="font-bold text-green-600">{r.tasks_completed}</p></div>
-                          <div className="bg-gray-50 rounded-xl p-3"><span className="text-gray-500 text-xs">Overdue</span><p className="font-bold text-red-600">{r.tasks_overdue}</p></div>
-                          <div className="bg-gray-50 rounded-xl p-3"><span className="text-gray-500 text-xs">Pending</span><p className="font-bold text-yellow-600">{r.tasks_pending}</p></div>
+                          <div className="bg-gray-50 rounded-xl p-3"><span className="text-gray-500 text-xs">Completed</span><p className="font-bold text-green-600">{r.completed_tasks}</p></div>
+                          <div className="bg-gray-50 rounded-xl p-3"><span className="text-gray-500 text-xs">Overdue</span><p className="font-bold text-red-600">{r.missed_deadlines}</p></div>
+                          <div className="bg-gray-50 rounded-xl p-3"><span className="text-gray-500 text-xs">Total</span><p className="font-bold text-gray-900">{r.total_tasks}</p></div>
                         </div>
                         {r.recommendations.length > 0 && (
                           <div className="bg-blue-50 rounded-xl p-3">

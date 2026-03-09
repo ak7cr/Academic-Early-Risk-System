@@ -87,12 +87,17 @@ export interface RiskHistoryEntry {
   computed_at: string;
 }
 
+export interface TrendPoint { week: string; value: number; }
+export interface BacklogPoint { week: string; overdue: number; pending: number; }
+export interface TrendData { completion_trend: TrendPoint[]; risk_trend: TrendPoint[]; backlog_trend: BacklogPoint[]; }
+export interface SimulatorResult { current: RiskResult; projected: RiskResult; }
+
 export const riskApi = {
   current: () => api.get<RiskResult>("/api/risk/current"),
   history: () => api.get<RiskHistoryEntry[]>("/api/risk/history"),
-  trends: () => api.get<{ labels: string[]; completion: number[]; overdue: number[]; workload: number[] }>("/api/risk/trends"),
-  simulate: (data: { overdue_tasks: number; completion_rate: number; workload_score: number }) =>
-    api.post<{ risk_level: string; explanation: string[]; recommendations: string[] }>("/api/risk/simulate", data),
+  trends: () => api.get<TrendData>("/api/risk/trends"),
+  simulate: (data: { complete_tasks: number; add_tasks: number }) =>
+    api.post<SimulatorResult>("/api/risk/simulate", data),
 };
 
 // --- Subjects ---
@@ -105,7 +110,7 @@ export interface Subject {
 
 export const subjectsApi = {
   list: () => api.get<Subject[]>("/api/subjects"),
-  withRisk: () => api.get<(Subject & { risk_level: string; completion_rate: number; pending_tasks: number })[]>("/api/subjects/with-risk"),
+  withRisk: () => api.get<(Subject & { risk_level: string; total_tasks: number; completed_tasks: number; overdue_tasks: number; student_id: number; created_at: string })[]>("/api/subjects/with-risk"),
   create: (data: { code: string; name: string; semester?: string }) =>
     api.post<Subject>("/api/subjects", data),
   delete: (id: number) => api.delete<void>(`/api/subjects/${id}`),
@@ -160,20 +165,20 @@ export const studentsApi = {
   detail: (id: number) => api.get<StudentSummary>(`/api/students/${id}`),
   risk: (id: number) => api.get<RiskResult>(`/api/students/${id}/risk`),
   trends: (id: number) => api.get<{ labels: string[]; completion: number[]; overdue: number[]; workload: number[] }>(`/api/students/${id}/trends`),
-  subjects: (id: number) => api.get<(Subject & { risk_level: string; completion_rate: number; pending_tasks: number })[]>(`/api/students/${id}/subjects`),
+  subjects: (id: number) => api.get<(Subject & { risk_level: string; total_tasks: number; completed_tasks: number; overdue_tasks: number; student_id: number; created_at: string })[]>(`/api/students/${id}/subjects`),
 };
 
 // --- Reports ---
 export interface WeeklyReport {
   student_name: string;
-  student_id: string;
-  week_start: string;
-  week_end: string;
-  risk_level: string;
+  student_id: string | null;
+  report_period: string;
+  total_tasks: number;
+  completed_tasks: number;
+  missed_deadlines: number;
   completion_rate: number;
-  tasks_completed: number;
-  tasks_overdue: number;
-  tasks_pending: number;
+  risk_level: string;
+  workload_score: number;
   recommendations: string[];
 }
 
