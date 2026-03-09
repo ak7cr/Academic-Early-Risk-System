@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine, Base, SessionLocal
 from .seed import seed_database
-from .routers import auth, subjects, tasks, risk, students, reports
+from .routers import auth, subjects, tasks, risk, students, reports, admin
 
 # Create tables and seed — runs at import time (works for both serverless and uvicorn)
 try:
@@ -47,6 +47,7 @@ app.include_router(tasks.router)
 app.include_router(risk.router)
 app.include_router(students.router)
 app.include_router(reports.router)
+app.include_router(admin.router)
 
 
 @app.get("/api/health")
