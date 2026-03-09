@@ -29,13 +29,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Build allowed origins from env or use defaults for local dev + production
-_origins = os.environ.get(
+# Always allow the production frontend; extra origins via env var
+_PRODUCTION_ORIGINS = [
+    "https://academic-early-risk-system-o8v1.vercel.app",
+]
+_extra = os.environ.get(
     "ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,https://academic-early-risk-system-o8v1.vercel.app",
+    "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176",
 ).split(",")
-# Strip whitespace/trailing slashes so origins match exactly
-_origins = [o.strip().rstrip("/") for o in _origins if o.strip()]
+_origins = list({o.strip().rstrip("/") for o in _extra if o.strip()} | set(_PRODUCTION_ORIGINS))
 
 app.add_middleware(
     CORSMiddleware,
