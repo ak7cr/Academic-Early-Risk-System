@@ -79,7 +79,7 @@ export function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2563EB] via-[#3B82F6] to-[#6366F1] flex items-center justify-center p-8">
+    <div className="min-h-screen bg-linear-to-br from-[#2563EB] via-[#3B82F6] to-[#6366F1] flex items-center justify-center p-8">
       <div className="w-full max-w-md">
         {/* Back button */}
         <button

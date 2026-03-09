@@ -26,7 +26,7 @@ export function TopNavbar({ title, subtitle, userName = "User" }: TopNavbarProps
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">{userName}</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2563EB] to-[#9333EA] flex items-center justify-center text-white font-bold">
+          <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#2563EB] to-[#9333EA] flex items-center justify-center text-white font-bold">
             {userName.charAt(0)}
           </div>
         </div>

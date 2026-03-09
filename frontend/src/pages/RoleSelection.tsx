@@ -5,7 +5,7 @@ export function RoleSelection() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2563EB] via-[#3B82F6] to-[#6366F1] flex items-center justify-center p-8">
+    <div className="min-h-screen bg-linear-to-br from-[#2563EB] via-[#3B82F6] to-[#6366F1] flex items-center justify-center p-8">
       <div className="max-w-6xl w-full">
         {/* Header */}
         <div className="text-center mb-16">

@@ -57,7 +57,7 @@ export function StudentDetail() {
           <div className="bg-white rounded-2xl p-8 shadow-sm mb-8">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white text-2xl font-bold">
+                <div className="w-20 h-20 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white text-2xl font-bold">
                   A
                 </div>
                 <div>

@@ -44,7 +44,7 @@ export function FacultyDashboard() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white font-bold text-lg">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white font-bold text-lg">
                       {student.name.charAt(0)}
                     </div>
                     <div>
@@ -74,7 +74,7 @@ export function FacultyDashboard() {
                           style={{ width: `${student.completion}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium text-gray-700 min-w-[3rem]">{student.completion}%</span>
+                      <span className="text-sm font-medium text-gray-700 min-w-12">{student.completion}%</span>
                     </div>
                   </div>
 
