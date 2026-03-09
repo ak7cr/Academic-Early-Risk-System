@@ -9,12 +9,16 @@ from .seed import seed_database
 from .routers import auth, subjects, tasks, risk, students, reports
 
 # Create tables and seed — runs at import time (works for both serverless and uvicorn)
-Base.metadata.create_all(bind=engine)
-_db = SessionLocal()
 try:
-    seed_database(_db)
-finally:
-    _db.close()
+    Base.metadata.create_all(bind=engine)
+    _db = SessionLocal()
+    try:
+        seed_database(_db)
+    finally:
+        _db.close()
+except Exception as exc:
+    import logging
+    logging.getLogger(__name__).warning("DB init/seed failed (will retry on first request): %s", exc)
 
 
 @asynccontextmanager
