@@ -14,8 +14,15 @@ if not DATABASE_URL:
         "On Vercel, add it in Settings → Environment Variables."
     )
 
+# Convert postgresql:// to postgresql+pg8000:// for the pure-Python driver
+_url = DATABASE_URL
+if _url.startswith("postgresql://"):
+    _url = _url.replace("postgresql://", "postgresql+pg8000://", 1)
+elif _url.startswith("postgres://"):
+    _url = _url.replace("postgres://", "postgresql+pg8000://", 1)
+
 # Use NullPool for serverless (Vercel) — no persistent connection pool
-engine = create_engine(DATABASE_URL, pool_pre_ping=True, poolclass=NullPool)
+engine = create_engine(_url, pool_pre_ping=True, poolclass=NullPool)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
