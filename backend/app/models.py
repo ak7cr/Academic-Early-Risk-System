@@ -94,3 +94,5 @@ class RiskHistory(Base):
     overdue_tasks: Mapped[int] = mapped_column(Integer, nullable=False)
     workload_score: Mapped[float] = mapped_column(Float, nullable=False)
     computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    student = relationship("User", back_populates="risk_history")
