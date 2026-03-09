@@ -65,3 +65,23 @@ def health():
         "risk_engine": "active",
         "version": "1.0.0",
     }
+
+
+@app.get("/api/debug")
+def debug():
+    """Temporary endpoint to diagnose Vercel deployment issues."""
+    import importlib
+    info: dict = {"db_url_set": bool(os.environ.get("DATABASE_URL"))}
+    try:
+        import pg8000
+        info["pg8000"] = pg8000.__version__
+    except ImportError as e:
+        info["pg8000_error"] = str(e)
+    try:
+        from .database import engine
+        with engine.connect() as conn:
+            conn.execute(__import__("sqlalchemy").text("SELECT 1"))
+        info["db_connection"] = "ok"
+    except Exception as e:
+        info["db_connection_error"] = str(e)
+    return info
