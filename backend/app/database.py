@@ -1,4 +1,5 @@
 import os
+import ssl
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
@@ -21,8 +22,16 @@ if _url.startswith("postgresql://"):
 elif _url.startswith("postgres://"):
     _url = _url.replace("postgres://", "postgresql+pg8000://", 1)
 
+# pg8000 needs an ssl_context for SSL connections (Supabase pooler requires SSL)
+_ssl_context = ssl.create_default_context()
+
 # Use NullPool for serverless (Vercel) — no persistent connection pool
-engine = create_engine(_url, pool_pre_ping=True, poolclass=NullPool)
+engine = create_engine(
+    _url,
+    pool_pre_ping=True,
+    poolclass=NullPool,
+    connect_args={"ssl_context": _ssl_context},
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
