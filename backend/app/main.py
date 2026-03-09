@@ -29,10 +29,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Build allowed origins from env or use defaults for local dev
+# Build allowed origins from env or use defaults for local dev + production
 _origins = os.environ.get(
     "ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176",
+    "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,https://academic-early-risk-system-o8v1.vercel.app",
 ).split(",")
 # Strip whitespace/trailing slashes so origins match exactly
 _origins = [o.strip().rstrip("/") for o in _origins if o.strip()]
