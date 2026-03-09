@@ -30,7 +30,12 @@ app = FastAPI(
 )
 
 # Build allowed origins from env or use defaults for local dev
-_origins = os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176").split(",")
+_origins = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176",
+).split(",")
+# Strip whitespace/trailing slashes so origins match exactly
+_origins = [o.strip().rstrip("/") for o in _origins if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
