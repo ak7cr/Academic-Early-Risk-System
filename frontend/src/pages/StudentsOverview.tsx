@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, BarChart3, FileText, Settings,
-  UserCheck, AlertTriangle, TrendingUp, Percent,
+  UserCheck, AlertTriangle, TrendingUp, Percent, Loader2,
 } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
@@ -8,6 +9,7 @@ import { MetricCard } from "../components/MetricCard";
 import { RiskBadge } from "../components/RiskBadge";
 import { AlertBanner } from "../components/AlertBanner";
 import { useNavigate } from "react-router";
+import { studentsApi, type StudentSummary, type User } from "../lib/api";
 
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
@@ -17,37 +19,56 @@ const facultySidebar = [
   { icon: Settings, label: "Settings", path: "/faculty/settings" },
 ];
 
-const students = [
-  { id: 1, name: "Alice Johnson", email: "alice.johnson@university.edu", studentId: "2024001", risk: "high" as const, completion: 62, missed: 4, workload: 8.5 },
-  { id: 2, name: "Bob Smith", email: "bob.smith@university.edu", studentId: "2024002", risk: "low" as const, completion: 92, missed: 0, workload: 3.2 },
-  { id: 3, name: "Carol Martinez", email: "carol.martinez@university.edu", studentId: "2024003", risk: "medium" as const, completion: 75, missed: 1, workload: 5.8 },
-  { id: 4, name: "David Chen", email: "david.chen@university.edu", studentId: "2024004", risk: "high" as const, completion: 45, missed: 5, workload: 9.7 },
-  { id: 5, name: "Emma Wilson", email: "emma.wilson@university.edu", studentId: "2024005", risk: "medium" as const, completion: 78, missed: 1, workload: 4.5 },
-];
-
 export function StudentsOverview() {
   const navigate = useNavigate();
+  const [students, setStudents] = useState<StudentSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
+
+  useEffect(() => {
+    studentsApi.list()
+      .then(setStudents)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const highRisk = students.filter((s) => s.risk_level === "high").length;
+  const atRisk = students.filter((s) => s.risk_level !== "low").length;
+  const avgCompletion = students.length > 0
+    ? Math.round(students.reduce((sum, s) => sum + s.completion_rate, 0) / students.length)
+    : 0;
+  const atRiskPct = students.length > 0 ? Math.round((atRisk / students.length) * 100) : 0;
 
   return (
     <div className="flex h-screen bg-[#F9FAFB]">
       <Sidebar role="faculty" items={facultySidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNavbar title="Students" subtitle="Monitor all students in your class" userName="Dr. Sarah Johnson" />
+        <TopNavbar title="Students" subtitle="Monitor all students in your class" userName={user?.name || "Faculty"} />
 
         <div className="flex-1 overflow-y-auto p-8">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="w-8 h-8 animate-spin text-[#6D28D9]" />
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+          ) : (
+          <>
           {/* Summary Cards */}
           <div className="grid grid-cols-4 gap-6 mb-8">
-            <MetricCard icon={UserCheck} title="Total Students" value="5" description="Active enrollments" status="neutral" />
-            <MetricCard icon={AlertTriangle} title="High Risk Students" value="2" description="Requires immediate attention" status="danger" />
-            <MetricCard icon={TrendingUp} title="Avg Completion Rate" value="70%" description="Class average" status="success" />
-            <MetricCard icon={Percent} title="At-Risk Students" value="80%" description="High + Medium risk" status="warning" />
+            <MetricCard icon={UserCheck} title="Total Students" value={String(students.length)} description="Active enrollments" status="neutral" />
+            <MetricCard icon={AlertTriangle} title="High Risk Students" value={String(highRisk)} description="Requires immediate attention" status="danger" />
+            <MetricCard icon={TrendingUp} title="Avg Completion Rate" value={`${avgCompletion}%`} description="Class average" status="success" />
+            <MetricCard icon={Percent} title="At-Risk Students" value={`${atRiskPct}%`} description="High + Medium risk" status="warning" />
           </div>
 
-          {/* Alert */}
+          {highRisk > 0 && (
           <div className="mb-8">
-            <AlertBanner message="Intervention Required — 2 students are at high risk of academic failure. Immediate intervention recommended." type="danger" />
+            <AlertBanner message={`Intervention Required — ${highRisk} student${highRisk > 1 ? "s are" : " is"} at high risk of academic failure. Immediate intervention recommended.`} type="danger" />
           </div>
+          )}
 
           {/* Table */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -57,7 +78,7 @@ export function StudentsOverview() {
                 <p className="text-sm text-gray-600 mt-0.5">Comprehensive view of all students</p>
               </div>
               <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700">
-                <option>All Students (5)</option>
+                <option>All Students ({students.length})</option>
                 <option>High Risk</option>
                 <option>Medium Risk</option>
                 <option>Low Risk</option>
@@ -87,23 +108,23 @@ export function StudentsOverview() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{s.studentId}</td>
-                      <td className="px-6 py-4 whitespace-nowrap"><RiskBadge level={s.risk} size="sm" /></td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{s.student_id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap"><RiskBadge level={s.risk_level as "high" | "medium" | "low"} size="sm" /></td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                              className={`h-full rounded-full ${s.completion < 50 ? "bg-red-500" : s.completion < 75 ? "bg-yellow-500" : "bg-green-500"}`}
-                              style={{ width: `${s.completion}%` }}
+                              className={`h-full rounded-full ${s.completion_rate < 50 ? "bg-red-500" : s.completion_rate < 75 ? "bg-yellow-500" : "bg-green-500"}`}
+                              style={{ width: `${s.completion_rate}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium text-gray-700">{s.completion}%</span>
+                          <span className="text-sm font-medium text-gray-700">{s.completion_rate}%</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`text-sm font-medium ${s.missed > 2 ? "text-red-600" : s.missed > 0 ? "text-yellow-600" : "text-green-600"}`}>{s.missed}</span>
+                        <span className={`text-sm font-medium ${s.missed_deadlines > 2 ? "text-red-600" : s.missed_deadlines > 0 ? "text-yellow-600" : "text-green-600"}`}>{s.missed_deadlines}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{s.workload}/10</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{s.workload_score}/10</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => navigate(`/faculty/student/${s.id}`)}
@@ -118,6 +139,8 @@ export function StudentsOverview() {
               </table>
             </div>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>

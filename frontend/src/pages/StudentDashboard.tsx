@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText,
-  AlertCircle, CheckCircle2, Clock, TrendingUp,
+  AlertCircle, CheckCircle2, Clock, TrendingUp, Loader2,
 } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
@@ -9,6 +10,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
+import { riskApi, subjectsApi, type RiskResult, type User } from "../lib/api";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/student/dashboard" },
@@ -19,80 +21,90 @@ const sidebarItems = [
   { icon: FileText, label: "Reports", path: "/student/reports" },
 ];
 
-const trendData = [
-  { week: "Week 1", completion: 75 },
-  { week: "Week 2", completion: 72 },
-  { week: "Week 3", completion: 68 },
-  { week: "Week 4", completion: 65 },
-  { week: "Week 5", completion: 62 },
-];
-
-const riskForecast = [
-  { week: "Week 1", risk: 30 },
-  { week: "Week 2", risk: 45 },
-  { week: "Week 3", risk: 60 },
-  { week: "Week 4", risk: 75 },
-  { week: "Current", risk: 85 },
-];
-
-const backlogData = [
-  { week: "Week 1", overdue: 1, pending: 3 },
-  { week: "Week 2", overdue: 2, pending: 4 },
-  { week: "Week 3", overdue: 2, pending: 6 },
-  { week: "Week 4", overdue: 3, pending: 7 },
-];
-
-const subjects = [
-  { code: "CS201", risk: "HIGH RISK" },
-  { code: "CS301", risk: "MEDIUM RISK" },
-  { code: "CS202", risk: "LOW RISK" },
-  { code: "CS302", risk: "MEDIUM RISK" },
-  { code: "CS401", risk: "LOW RISK" },
-];
+interface SubjectWithRisk { code: string; name: string; risk_level: string; }
+interface TrendPoint { week: string; value: number; }
+interface BacklogPoint { week: string; overdue: number; pending: number; }
 
 export function StudentDashboard() {
+  const [risk, setRisk] = useState<RiskResult | null>(null);
+  const [subjects, setSubjects] = useState<SubjectWithRisk[]>([]);
+  const [completionTrend, setCompletionTrend] = useState<TrendPoint[]>([]);
+  const [riskTrend, setRiskTrend] = useState<TrendPoint[]>([]);
+  const [backlogTrend, setBacklogTrend] = useState<BacklogPoint[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
+
+  useEffect(() => {
+    Promise.all([
+      riskApi.current(),
+      subjectsApi.withRisk(),
+      riskApi.trends(),
+    ])
+      .then(([r, s, t]) => {
+        setRisk(r);
+        setSubjects(s as SubjectWithRisk[]);
+        setCompletionTrend((t as { completion_trend: TrendPoint[] }).completion_trend || []);
+        setRiskTrend((t as { risk_trend: TrendPoint[] }).risk_trend || []);
+        setBacklogTrend((t as { backlog_trend: BacklogPoint[] }).backlog_trend || []);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const pending = risk ? risk.total_tasks - risk.completed_tasks - risk.overdue_tasks : 0;
+
   return (
     <div className="flex h-screen bg-[#F9FAFB]">
       <Sidebar role="student" items={sidebarItems} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNavbar title="Dashboard" subtitle="Real-time Academic Health Monitoring" userName="Student Name" />
+        <TopNavbar title="Dashboard" subtitle="Real-time Academic Health Monitoring" userName={user?.name || "Student"} />
 
         <div className="flex-1 overflow-y-auto p-8">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="w-8 h-8 animate-spin text-[#2563EB]" />
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+          ) : risk ? (
+          <>
           {/* Metric Cards */}
           <div className="grid grid-cols-4 gap-6 mb-8">
-            <MetricCard icon={AlertCircle} title="Current Risk Level" value="High" description="Trending Up" status="danger" />
-            <MetricCard icon={CheckCircle2} title="Completion Rate" value="13%" description="1 of 8 tasks" status="danger" />
-            <MetricCard icon={Clock} title="Missed Deadlines" value="3" description="Requires immediate attention" status="danger" />
-            <MetricCard icon={TrendingUp} title="Workload Pressure" value="Low" description="4 pending tasks" status="success" />
+            <MetricCard icon={AlertCircle} title="Current Risk Level" value={risk.risk_level.charAt(0).toUpperCase() + risk.risk_level.slice(1)} description={risk.risk_level === "high" ? "Trending Up" : risk.risk_level === "medium" ? "Moderate" : "Stable"} status={risk.risk_level === "high" ? "danger" : risk.risk_level === "medium" ? "warning" : "success"} />
+            <MetricCard icon={CheckCircle2} title="Completion Rate" value={`${risk.completion_rate}%`} description={`${risk.completed_tasks} of ${risk.total_tasks} tasks`} status={risk.completion_rate < 60 ? "danger" : risk.completion_rate < 80 ? "warning" : "success"} />
+            <MetricCard icon={Clock} title="Missed Deadlines" value={String(risk.overdue_tasks)} description={risk.overdue_tasks > 2 ? "Requires immediate attention" : "Keep it up"} status={risk.overdue_tasks > 2 ? "danger" : risk.overdue_tasks > 0 ? "warning" : "success"} />
+            <MetricCard icon={TrendingUp} title="Workload Pressure" value={risk.workload_score > 7 ? "High" : risk.workload_score > 4 ? "Medium" : "Low"} description={`${pending} pending tasks`} status={risk.workload_score > 7 ? "danger" : risk.workload_score > 4 ? "warning" : "success"} />
           </div>
 
           {/* Explainable Risk Analysis */}
           <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
             <div className="flex items-start gap-3 mb-6">
-              <div className="p-2 bg-red-50 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-[#DC2626]" />
+              <div className={`p-2 rounded-lg ${risk.risk_level === "high" ? "bg-red-50" : risk.risk_level === "medium" ? "bg-yellow-50" : "bg-green-50"}`}>
+                <AlertCircle className={`w-5 h-5 ${risk.risk_level === "high" ? "text-[#DC2626]" : risk.risk_level === "medium" ? "text-yellow-600" : "text-green-600"}`} />
               </div>
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Explainable Risk Analysis</h2>
               </div>
             </div>
 
-            <div className="space-y-5">
-              <RiskBar label="Completion Rate" value="13%" percent={13} hint="Below target (80%). Complete pending tasks to improve." />
-              <RiskBar label="Missed Deadlines" value="3 tasks" percent={85} hint="Above acceptable threshold. Prioritize overdue items." />
-              <RiskBar label="Workload Pressure Score" value="10/10" percent={100} hint="High workload detected. Consider time management adjustments." />
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">Trend Direction</span>
-                  <span className="text-sm font-bold text-[#DC2626]">Worsening</span>
-                </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#DC2626] rounded-full" style={{ width: "75%" }} />
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Performance declining. Intervention recommended.</p>
-              </div>
+            <div className="space-y-4">
+              {risk.explanation.map((line, i) => (
+                <p key={i} className="text-sm text-gray-700">{line}</p>
+              ))}
             </div>
+
+            {risk.recommendations.length > 0 && (
+              <div className="mt-6 bg-blue-50 rounded-lg p-4">
+                <p className="text-sm font-semibold text-gray-800 mb-2">Recommendations:</p>
+                <ul className="space-y-1">
+                  {risk.recommendations.map((rec, i) => (
+                    <li key={i} className="text-sm text-gray-700">• {rec}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* Charts Grid */}
@@ -106,15 +118,15 @@ export function StudentDashboard() {
               <div className="space-y-3">
                 {subjects.map((s) => (
                   <div key={s.code} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">{s.code}</span>
+                    <span className="text-sm font-medium text-gray-700">{s.code} — {s.name}</span>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        s.risk === "HIGH RISK" ? "bg-red-100 text-red-700" :
-                        s.risk === "MEDIUM RISK" ? "bg-yellow-100 text-yellow-700" :
+                        s.risk_level === "high" ? "bg-red-100 text-red-700" :
+                        s.risk_level === "medium" ? "bg-yellow-100 text-yellow-700" :
                         "bg-green-100 text-green-700"
                       }`}
                     >
-                      {s.risk}
+                      {s.risk_level.toUpperCase()} RISK
                     </span>
                   </div>
                 ))}
@@ -127,21 +139,22 @@ export function StudentDashboard() {
                 <span className="text-xl">📈</span>
                 <h2 className="text-lg font-bold text-gray-900">Risk Trend Forecast</h2>
               </div>
-              <ResponsiveContainer width="100%" height={180}>
-                <LineChart data={riskForecast}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="week" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="risk" stroke="#DC2626" strokeWidth={2} name="Risk Score" />
-                </LineChart>
-              </ResponsiveContainer>
+              {riskTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={riskTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="week" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#DC2626" strokeWidth={2} name="Risk Score" />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">Not enough data yet.</p>
+              )}
               <div className="mt-4 bg-red-50 rounded-lg p-3">
                 <p className="text-xs text-gray-700">
-                  <span className="font-semibold">Forecast:</span> If current missed rate continues &rarr; risk will keep increasing.
-                </p>
-                <p className="text-xs text-gray-700 mt-1">
-                  💡 <span className="font-medium">Complete 3-5 overdue tasks this week to move to Low Risk.</span>
+                  <span className="font-semibold">Forecast:</span> {risk.risk_level === "high" ? "If current missed rate continues → risk will keep increasing." : risk.risk_level === "medium" ? "Maintain progress to move to Low Risk." : "You're on track — keep it up!"}
                 </p>
               </div>
             </div>
@@ -154,15 +167,19 @@ export function StudentDashboard() {
                 <span className="text-xl">📊</span>
                 <h2 className="text-lg font-bold text-gray-900">Task Completion Trend</h2>
               </div>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="week" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="completion" stroke="#2563EB" strokeWidth={2} name="Completion %" />
-                </LineChart>
-              </ResponsiveContainer>
+              {completionTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={completionTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="week" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={2} name="Completion %" />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">Not enough data yet.</p>
+              )}
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-sm">
@@ -170,36 +187,27 @@ export function StudentDashboard() {
                 <span className="text-xl">⚠️</span>
                 <h2 className="text-lg font-bold text-gray-900">Backlog Growth</h2>
               </div>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={backlogData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="week" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Legend wrapperStyle={{ fontSize: "12px" }} />
-                  <Bar dataKey="overdue" fill="#DC2626" name="Overdue Tasks" />
-                  <Bar dataKey="pending" fill="#FB923C" name="Pending Tasks" />
-                </BarChart>
-              </ResponsiveContainer>
+              {backlogTrend.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={backlogTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="week" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Legend wrapperStyle={{ fontSize: "12px" }} />
+                    <Bar dataKey="overdue" fill="#DC2626" name="Overdue Tasks" />
+                    <Bar dataKey="pending" fill="#FB923C" name="Pending Tasks" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">Not enough data yet.</p>
+              )}
             </div>
           </div>
+          </>
+          ) : null}
         </div>
       </div>
-    </div>
-  );
-}
-
-function RiskBar({ label, value, percent, hint }: { label: string; value: string; percent: number; hint: string }) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className="text-sm font-bold text-[#DC2626]">{value}</span>
-      </div>
-      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-        <div className="h-full bg-[#DC2626] rounded-full" style={{ width: `${percent}%` }} />
-      </div>
-      <p className="text-xs text-gray-500 mt-1">{hint}</p>
     </div>
   );
 }

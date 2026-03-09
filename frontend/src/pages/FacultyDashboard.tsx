@@ -1,11 +1,13 @@
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, BarChart3, FileText, Settings,
-  AlertTriangle,
+  AlertTriangle, Loader2,
 } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
 import { RiskBadge } from "../components/RiskBadge";
 import { useNavigate } from "react-router";
+import { studentsApi, type StudentSummary, type User } from "../lib/api";
 
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
@@ -15,25 +17,36 @@ const facultySidebar = [
   { icon: Settings, label: "Settings", path: "/faculty/settings" },
 ];
 
-const students = [
-  { id: 1, name: "Alice Johnson", email: "alice.johnson@university.edu", studentId: "2024001", risk: "high" as const, completion: 62, missed: 4, workload: 8.5 },
-  { id: 2, name: "Bob Smith", email: "bob.smith@university.edu", studentId: "2024002", risk: "low" as const, completion: 92, missed: 0, workload: 3.2 },
-  { id: 3, name: "Carol Martinez", email: "carol.martinez@university.edu", studentId: "2024003", risk: "medium" as const, completion: 75, missed: 1, workload: 5.8 },
-  { id: 4, name: "David Chen", email: "david.chen@university.edu", studentId: "2024004", risk: "high" as const, completion: 45, missed: 5, workload: 9.7 },
-  { id: 5, name: "Emma Wilson", email: "emma.wilson@university.edu", studentId: "2024005", risk: "medium" as const, completion: 78, missed: 1, workload: 4.5 },
-];
-
 export function FacultyDashboard() {
   const navigate = useNavigate();
+  const [students, setStudents] = useState<StudentSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
+
+  useEffect(() => {
+    studentsApi.list()
+      .then(setStudents)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="flex h-screen bg-[#F9FAFB]">
       <Sidebar role="faculty" items={facultySidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNavbar title="Dashboard" subtitle="Real-time Academic Health Monitoring" userName="Dr. Sarah Johnson" />
+        <TopNavbar title="Dashboard" subtitle="Real-time Academic Health Monitoring" userName={user?.name || "Faculty"} />
 
         <div className="flex-1 overflow-y-auto p-8">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="w-8 h-8 animate-spin text-[#6D28D9]" />
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+          ) : (
+          <>
           {/* Student List */}
           <div className="space-y-4">
             {students.map((student) => (
@@ -55,11 +68,11 @@ export function FacultyDashboard() {
 
                   <div className="text-center px-6">
                     <p className="text-xs text-gray-500">Student ID</p>
-                    <p className="text-sm font-medium text-gray-700">{student.studentId}</p>
+                    <p className="text-sm font-medium text-gray-700">{student.student_id}</p>
                   </div>
 
                   <div className="px-6">
-                    <RiskBadge level={student.risk} size="md" />
+                    <RiskBadge level={student.risk_level as "high" | "medium" | "low"} size="md" />
                   </div>
 
                   <div className="px-6">
@@ -67,29 +80,29 @@ export function FacultyDashboard() {
                       <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
-                            student.completion < 50 ? "bg-red-500" :
-                            student.completion < 75 ? "bg-yellow-500" :
+                            student.completion_rate < 50 ? "bg-red-500" :
+                            student.completion_rate < 75 ? "bg-yellow-500" :
                             "bg-green-500"
                           }`}
-                          style={{ width: `${student.completion}%` }}
+                          style={{ width: `${student.completion_rate}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium text-gray-700 min-w-12">{student.completion}%</span>
+                      <span className="text-sm font-medium text-gray-700 min-w-12">{student.completion_rate}%</span>
                     </div>
                   </div>
 
                   <div className="text-center px-6">
                     <p className={`text-lg font-bold ${
-                      student.missed > 2 ? "text-red-600" :
-                      student.missed > 0 ? "text-yellow-600" :
+                      student.missed_deadlines > 2 ? "text-red-600" :
+                      student.missed_deadlines > 0 ? "text-yellow-600" :
                       "text-green-600"
                     }`}>
-                      {student.missed}
+                      {student.missed_deadlines}
                     </p>
                   </div>
 
                   <div className="text-center px-6">
-                    <p className="text-sm font-medium text-gray-700">{student.workload}/10</p>
+                    <p className="text-sm font-medium text-gray-700">{student.workload_score}/10</p>
                   </div>
 
                   <button
@@ -141,6 +154,8 @@ export function FacultyDashboard() {
               </div>
             </div>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>

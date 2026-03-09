@@ -1,17 +1,19 @@
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, BarChart3, FileText, Settings,
   ArrowLeft, Mail, Hash, Calendar, Building2,
-  CheckCircle2, Clock, Zap, ListTodo,
+  CheckCircle2, Clock, Zap, ListTodo, Loader2,
 } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
 import { MetricCard } from "../components/MetricCard";
 import { RiskBadge } from "../components/RiskBadge";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   PieChart, Pie, Cell, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
+import { studentsApi, type StudentSummary, type RiskResult, type User } from "../lib/api";
 
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
@@ -21,27 +23,74 @@ const facultySidebar = [
   { icon: Settings, label: "Settings", path: "/faculty/settings" },
 ];
 
-const taskDistribution = [
-  { name: "Completed", value: 1, color: "#16A34A" },
-  { name: "Pending", value: 5, color: "#FACC15" },
-  { name: "Overdue", value: 3, color: "#DC2626" },
-];
-
-const subjectRisk = [
-  { subject: "High", value: 2 },
-  { subject: "Medium", value: 2 },
-  { subject: "Low", value: 1 },
-];
+interface SubjectRiskData {
+  id: number;
+  code: string;
+  name: string;
+  risk_level: string;
+  total_tasks: number;
+  completed_tasks: number;
+  overdue_tasks: number;
+}
 
 export function StudentDetail() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [student, setStudent] = useState<StudentSummary | null>(null);
+  const [risk, setRisk] = useState<RiskResult | null>(null);
+  const [subjects, setSubjects] = useState<SubjectRiskData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const currentUser: User | null = JSON.parse(localStorage.getItem("user") || "null");
+
+  useEffect(() => {
+    if (!id) return;
+    const sid = Number(id);
+    Promise.all([
+      studentsApi.detail(sid),
+      studentsApi.risk(sid),
+      studentsApi.subjects(sid),
+    ])
+      .then(([s, r, subj]) => {
+        setStudent(s);
+        setRisk(r);
+        setSubjects(subj as SubjectRiskData[]);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const completed = risk ? risk.completed_tasks : 0;
+  const overdue = risk ? risk.overdue_tasks : 0;
+  const pending = risk ? risk.total_tasks - completed - overdue : 0;
+
+  const taskDistribution = [
+    { name: "Completed", value: completed, color: "#16A34A" },
+    { name: "Pending", value: pending, color: "#FACC15" },
+    { name: "Overdue", value: overdue, color: "#DC2626" },
+  ];
+
+  const riskCounts = subjects.reduce(
+    (acc, s) => {
+      if (s.risk_level === "high") acc.high++;
+      else if (s.risk_level === "medium") acc.medium++;
+      else acc.low++;
+      return acc;
+    },
+    { high: 0, medium: 0, low: 0 },
+  );
+  const subjectRisk = [
+    { subject: "High", value: riskCounts.high },
+    { subject: "Medium", value: riskCounts.medium },
+    { subject: "Low", value: riskCounts.low },
+  ];
 
   return (
     <div className="flex h-screen bg-[#F9FAFB]">
       <Sidebar role="faculty" items={facultySidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNavbar title="Student Details" subtitle="Detailed academic performance analysis" userName="Dr. Sarah Johnson" />
+        <TopNavbar title="Student Details" subtitle="Detailed academic performance analysis" userName={currentUser?.name || "Faculty"} />
 
         <div className="flex-1 overflow-y-auto p-8">
           {/* Back */}
@@ -53,47 +102,55 @@ export function StudentDetail() {
             Back to Students
           </button>
 
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="w-8 h-8 animate-spin text-[#6D28D9]" />
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+          ) : student && risk ? (
+          <>
           {/* Profile Card */}
           <div className="bg-white rounded-2xl p-8 shadow-sm mb-8">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-6">
                 <div className="w-20 h-20 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white text-2xl font-bold">
-                  A
+                  {student.name.charAt(0)}
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-3">Alice Johnson</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 mb-3">{student.name}</h1>
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2 text-gray-600">
                       <Mail className="w-4 h-4" />
-                      <span className="text-sm">alice.johnson@university.edu</span>
+                      <span className="text-sm">{student.email}</span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600">
                       <Hash className="w-4 h-4" />
-                      <span className="text-sm">ID: 2024001</span>
+                      <span className="text-sm">ID: {student.student_id}</span>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2 text-gray-600">
                         <Calendar className="w-4 h-4" />
-                        <span className="text-sm">Year: 2024</span>
+                        <span className="text-sm">Year: {student.year}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-600">
                         <Building2 className="w-4 h-4" />
-                        <span className="text-sm">Computer Science</span>
+                        <span className="text-sm">{student.department}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <RiskBadge level="high" size="lg" />
+              <RiskBadge level={student.risk_level as "high" | "medium" | "low"} size="lg" />
             </div>
           </div>
 
           {/* Metrics */}
           <div className="grid grid-cols-4 gap-6 mb-8">
-            <MetricCard icon={CheckCircle2} title="Completion Rate" value="62%" description="1 of 8 tasks" status="danger" />
-            <MetricCard icon={Clock} title="Missed Deadlines" value="4" description="Overdue tasks" status="danger" />
-            <MetricCard icon={Zap} title="Workload Pressure" value="8.5/10" description="Out of 10" status="warning" />
-            <MetricCard icon={ListTodo} title="Pending Tasks" value="3" description="Active assignments" status="warning" />
+            <MetricCard icon={CheckCircle2} title="Completion Rate" value={`${risk.completion_rate}%`} description={`${risk.completed_tasks} of ${risk.total_tasks} tasks`} status={risk.completion_rate < 60 ? "danger" : risk.completion_rate < 80 ? "warning" : "success"} />
+            <MetricCard icon={Clock} title="Missed Deadlines" value={String(risk.overdue_tasks)} description="Overdue tasks" status={risk.overdue_tasks > 2 ? "danger" : risk.overdue_tasks > 0 ? "warning" : "success"} />
+            <MetricCard icon={Zap} title="Workload Pressure" value={`${risk.workload_score}/10`} description="Out of 10" status={risk.workload_score > 7 ? "danger" : risk.workload_score > 4 ? "warning" : "success"} />
+            <MetricCard icon={ListTodo} title="Pending Tasks" value={String(pending)} description="Active assignments" status={pending > 4 ? "warning" : "success"} />
           </div>
 
           {/* Charts */}
@@ -154,6 +211,8 @@ export function StudentDetail() {
               </div>
             </div>
           </div>
+          </>
+          ) : null}
         </div>
       </div>
     </div>

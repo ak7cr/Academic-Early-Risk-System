@@ -16,18 +16,25 @@ def seed_database(db: Session):
 
     now = datetime.now(timezone.utc)
 
-    # Faculty
-    faculty_user = User(
+    # Faculty (2 members)
+    faculty1 = User(
         email="sarah.johnson@university.edu",
         password_hash=hash_password("faculty123"),
         name="Dr. Sarah Johnson",
         role=UserRole.faculty,
         department="Computer Science",
     )
-    db.add(faculty_user)
+    faculty2 = User(
+        email="james.patel@university.edu",
+        password_hash=hash_password("faculty123"),
+        name="Dr. James Patel",
+        role=UserRole.faculty,
+        department="Computer Science",
+    )
+    db.add_all([faculty1, faculty2])
     db.flush()
 
-    # Students with varying risk profiles
+    # Students with varying risk profiles (3 students)
     students_data = [
         {
             "email": "alice.johnson@university.edu",
@@ -98,56 +105,6 @@ def seed_database(db: Session):
                 ("ML Dataset Analysis", 3, "assignment", 5, "pending", None),
                 ("DS Midterm Review", 0, "exam", 3, "pending", None),
                 ("OS Lab 3", 1, "assignment", 7, "pending", None),
-            ],
-        },
-        {
-            "email": "david.chen@university.edu",
-            "name": "David Chen",
-            "student_id": "2024004",
-            "department": "Computer Science",
-            "year": 2024,
-            "subjects": [
-                ("CS201", "Data Structures"),
-                ("CS301", "Operating Systems"),
-                ("CS302", "Software Engineering"),
-                ("CS401", "Machine Learning"),
-                ("CS202", "Database Systems"),
-            ],
-            # HIGH RISK: very low completion, many overdue
-            "tasks": [
-                ("DS Assignment 1", 0, "assignment", -14, "overdue", None),
-                ("DS Lab Report", 0, "assignment", -7, "overdue", None),
-                ("DS Midterm Prep", 0, "exam", -3, "overdue", None),
-                ("OS Project Phase 1", 1, "assignment", -10, "overdue", None),
-                ("OS Quiz 2", 1, "exam", -5, "overdue", None),
-                ("SE Sprint 1", 2, "assignment", -12, "completed", -11),
-                ("SE Sprint 2", 2, "assignment", -3, "overdue", None),
-                ("ML Dataset Analysis", 3, "assignment", 2, "pending", None),
-                ("DB ER Diagram", 4, "assignment", 5, "pending", None),
-                ("DS Final Project", 0, "assignment", 10, "pending", None),
-            ],
-        },
-        {
-            "email": "emma.wilson@university.edu",
-            "name": "Emma Wilson",
-            "student_id": "2024005",
-            "department": "Computer Science",
-            "year": 2024,
-            "subjects": [
-                ("CS201", "Data Structures"),
-                ("CS301", "Operating Systems"),
-                ("CS302", "Software Engineering"),
-            ],
-            # MEDIUM RISK: decent completion, 1 overdue
-            "tasks": [
-                ("DS Assignment 1", 0, "assignment", -14, "completed", -13),
-                ("DS Lab Report", 0, "assignment", -7, "completed", -8),
-                ("DS Midterm Prep", 0, "exam", -3, "completed", -2),
-                ("OS Project Phase 1", 1, "assignment", -10, "completed", -9),
-                ("OS Quiz 2", 1, "exam", -5, "overdue", None),
-                ("SE Sprint 1", 2, "assignment", -12, "completed", -11),
-                ("SE Sprint 2", 2, "assignment", 3, "pending", None),
-                ("DS Final Review", 0, "exam", 7, "pending", None),
             ],
         },
     ]

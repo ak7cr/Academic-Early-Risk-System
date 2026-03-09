@@ -150,7 +150,8 @@ export interface StudentSummary {
   year: number;
   risk_level: string;
   completion_rate: number;
-  overdue_tasks: number;
+  missed_deadlines: number;
+  workload_score: number;
   total_tasks: number;
 }
 
