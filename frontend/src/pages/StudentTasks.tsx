@@ -33,12 +33,12 @@ export function StudentTasks() {
   };
 
   const statusBadge = (status: string) => {
-    const colors = status === "completed" ? "bg-green-100 text-green-700" : status === "overdue" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700";
+    const colors = status === "completed" ? "bg-green-100 dark:bg-green-900/40 text-green-700" : status === "overdue" ? "bg-red-100 dark:bg-red-900/40 text-red-700" : "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700";
     return <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${colors}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
   };
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB]">
+    <div className="flex h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Sidebar role="student" items={sidebarItems} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar title="Tasks" subtitle="Manage your assignments and deadlines" userName={user?.name || "Student"} />
@@ -48,38 +48,38 @@ export function StudentTasks() {
               <Loader2 className="w-8 h-8 animate-spin text-[#2563EB]" />
             </div>
           ) : error ? (
-            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-700 rounded-2xl p-6 text-center">{error}</div>
           ) : tasks.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
-              <ListTodo className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">No Tasks Yet</h2>
-              <p className="text-gray-600">You don't have any tasks assigned.</p>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm text-center">
+              <ListTodo className="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Tasks Yet</h2>
+              <p className="text-gray-600 dark:text-gray-400">You don't have any tasks assigned.</p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-200">
-                <h2 className="text-lg font-bold text-gray-900">All Tasks ({tasks.length})</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">All Tasks ({tasks.length})</h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
                     <tr>
                       {["Status", "Title", "Subject", "Type", "Due Date", "Est. Hours"].map((h) => (
-                        <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
+                        <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{h}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {tasks.map((t) => (
-                      <tr key={t.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">{statusIcon(t.status)}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{t.title}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">{t.title}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{t.subject_name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{t.subject_name}</td>
                         <td className="px-6 py-4 whitespace-nowrap">{statusBadge(t.task_type)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{new Date(t.due_date).toLocaleDateString()}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{t.estimated_hours}h</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{new Date(t.due_date).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{t.estimated_hours}h</td>
                       </tr>
                     ))}
                   </tbody>

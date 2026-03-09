@@ -23,17 +23,17 @@ export function RoleSelection() {
           {/* Student Card */}
           <button
             onClick={() => navigate("/auth/student")}
-            className="bg-white rounded-2xl p-10 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left group"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-10 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left group"
           >
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+              <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <User className="w-8 h-8 text-[#2563EB]" strokeWidth={2} />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Student</h2>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Student</h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-6">
                 Access your personal dashboard, track tasks, view risk analysis, and get personalized recommendations
               </p>
-              <ul className="space-y-2 text-sm text-gray-600 w-full">
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400 w-full">
                 <li className="flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-gray-400"></div>
                   <span>Track assignments and deadlines</span>
@@ -57,17 +57,17 @@ export function RoleSelection() {
           {/* Faculty Card */}
           <button
             onClick={() => navigate("/auth/faculty")}
-            className="bg-white rounded-2xl p-10 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left group"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-10 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left group"
           >
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+              <div className="w-16 h-16 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <GraduationCap className="w-8 h-8 text-[#9333EA]" strokeWidth={2} />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Faculty</h2>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Faculty</h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-6">
                 Monitor all students, view class-wide analytics, generate reports, and identify at-risk students
               </p>
-              <ul className="space-y-2 text-sm text-gray-600 w-full">
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400 w-full">
                 <li className="flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-gray-400"></div>
                   <span>Monitor all student risk levels</span>

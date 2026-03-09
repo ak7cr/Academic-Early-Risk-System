@@ -27,7 +27,7 @@ export function StudentReports() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB]">
+    <div className="flex h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Sidebar role="student" items={sidebarItems} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar title="Reports" subtitle="View your academic progress reports" userName={user?.name || "Student"} />
@@ -37,45 +37,45 @@ export function StudentReports() {
               <Loader2 className="w-8 h-8 animate-spin text-[#2563EB]" />
             </div>
           ) : error ? (
-            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-700 rounded-2xl p-6 text-center">{error}</div>
           ) : report ? (
             <div className="max-w-2xl mx-auto">
-              <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <FileText className="w-6 h-6 text-[#2563EB]" />
-                  <h2 className="text-xl font-bold text-gray-900">Weekly Report</h2>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">Weekly Report</h2>
                 </div>
-                <div className="text-sm text-gray-500 mb-6">
+                <div className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                   {report.report_period}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 mb-1">Risk Level</p>
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Risk Level</p>
                     <p className={`text-lg font-bold ${report.risk_level === "high" ? "text-red-600" : report.risk_level === "medium" ? "text-yellow-600" : "text-green-600"}`}>
                       {report.risk_level.charAt(0).toUpperCase() + report.risk_level.slice(1)}
                     </p>
                   </div>
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 mb-1">Completion Rate</p>
-                    <p className="text-lg font-bold text-gray-900">{report.completion_rate}%</p>
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Completion Rate</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">{report.completion_rate}%</p>
                   </div>
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 mb-1">Tasks Completed</p>
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Tasks Completed</p>
                     <p className="text-lg font-bold text-green-600">{report.completed_tasks}</p>
                   </div>
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 mb-1">Tasks Overdue</p>
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Tasks Overdue</p>
                     <p className="text-lg font-bold text-red-600">{report.missed_deadlines}</p>
                   </div>
                 </div>
 
                 {report.recommendations.length > 0 && (
-                  <div className="bg-blue-50 rounded-xl p-4">
-                    <p className="text-sm font-semibold text-gray-800 mb-2">Recommendations</p>
+                  <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Recommendations</p>
                     <ul className="space-y-1">
                       {report.recommendations.map((r, i) => (
-                        <li key={i} className="text-sm text-gray-700">• {r}</li>
+                        <li key={i} className="text-sm text-gray-700 dark:text-gray-300">• {r}</li>
                       ))}
                     </ul>
                   </div>

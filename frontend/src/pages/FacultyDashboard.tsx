@@ -32,7 +32,7 @@ export function FacultyDashboard() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB]">
+    <div className="flex h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Sidebar role="faculty" items={facultySidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -44,7 +44,7 @@ export function FacultyDashboard() {
               <Loader2 className="w-8 h-8 animate-spin text-[#6D28D9]" />
             </div>
           ) : error ? (
-            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-700 rounded-2xl p-6 text-center">{error}</div>
           ) : (
           <>
           {/* Student List */}
@@ -52,7 +52,7 @@ export function FacultyDashboard() {
             {students.map((student) => (
               <div
                 key={student.id}
-                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => navigate(`/faculty/student/${student.id}`)}
               >
                 <div className="flex items-center justify-between">
@@ -61,14 +61,14 @@ export function FacultyDashboard() {
                       {student.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900">{student.name}</h3>
-                      <p className="text-sm text-gray-500">{student.email}</p>
+                      <h3 className="font-bold text-gray-900 dark:text-white">{student.name}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{student.email}</p>
                     </div>
                   </div>
 
                   <div className="text-center px-6">
-                    <p className="text-xs text-gray-500">Student ID</p>
-                    <p className="text-sm font-medium text-gray-700">{student.student_id}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Student ID</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{student.student_id}</p>
                   </div>
 
                   <div className="px-6">
@@ -77,7 +77,7 @@ export function FacultyDashboard() {
 
                   <div className="px-6">
                     <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="w-24 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
                             student.completion_rate < 50 ? "bg-red-500" :
@@ -87,7 +87,7 @@ export function FacultyDashboard() {
                           style={{ width: `${student.completion_rate}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium text-gray-700 min-w-12">{student.completion_rate}%</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-12">{student.completion_rate}%</span>
                     </div>
                   </div>
 
@@ -102,7 +102,7 @@ export function FacultyDashboard() {
                   </div>
 
                   <div className="text-center px-6">
-                    <p className="text-sm font-medium text-gray-700">{student.workload_score}/10</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{student.workload_score}/10</p>
                   </div>
 
                   <button
@@ -118,38 +118,38 @@ export function FacultyDashboard() {
 
           {/* Quick Action Cards */}
           <div className="grid grid-cols-3 gap-6 mt-8">
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-blue-50 rounded-lg">
+                <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                   <BarChart3 className="w-6 h-6 text-[#2563EB]" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Class Analytics</h3>
-                  <p className="text-sm text-gray-600">View detailed performance metrics and trends</p>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-1">Class Analytics</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">View detailed performance metrics and trends</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-green-50 rounded-lg">
+                <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
                   <FileText className="w-6 h-6 text-[#16A34A]" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Generate Reports</h3>
-                  <p className="text-sm text-gray-600">Create comprehensive reports for individual students or entire class</p>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-1">Generate Reports</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Create comprehensive reports for individual students or entire class</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex items-start gap-3">
-                <div className="p-2 bg-red-50 rounded-lg">
+                <div className="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">
                   <AlertTriangle className="w-6 h-6 text-[#DC2626]" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Priority Students</h3>
-                  <p className="text-sm text-gray-600">Focus on high-risk students requiring immediate intervention</p>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-1">Priority Students</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Focus on high-risk students requiring immediate intervention</p>
                 </div>
               </div>
             </div>

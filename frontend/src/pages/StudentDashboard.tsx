@@ -53,7 +53,7 @@ export function StudentDashboard() {
   const pending = risk ? risk.total_tasks - risk.completed_tasks - risk.overdue_tasks : 0;
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB]">
+    <div className="flex h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Sidebar role="student" items={sidebarItems} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -65,7 +65,7 @@ export function StudentDashboard() {
               <Loader2 className="w-8 h-8 animate-spin text-[#2563EB]" />
             </div>
           ) : error ? (
-            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-700 rounded-2xl p-6 text-center">{error}</div>
           ) : risk ? (
           <>
           {/* Metric Cards */}
@@ -77,28 +77,28 @@ export function StudentDashboard() {
           </div>
 
           {/* Explainable Risk Analysis */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm mb-8">
             <div className="flex items-start gap-3 mb-6">
-              <div className={`p-2 rounded-lg ${risk.risk_level === "high" ? "bg-red-50" : risk.risk_level === "medium" ? "bg-yellow-50" : "bg-green-50"}`}>
+              <div className={`p-2 rounded-lg ${risk.risk_level === "high" ? "bg-red-50 dark:bg-red-900/30" : risk.risk_level === "medium" ? "bg-yellow-50 dark:bg-yellow-900/30" : "bg-green-50 dark:bg-green-900/30"}`}>
                 <AlertCircle className={`w-5 h-5 ${risk.risk_level === "high" ? "text-[#DC2626]" : risk.risk_level === "medium" ? "text-yellow-600" : "text-green-600"}`} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Explainable Risk Analysis</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Explainable Risk Analysis</h2>
               </div>
             </div>
 
             <div className="space-y-4">
               {risk.explanation.map((line, i) => (
-                <p key={i} className="text-sm text-gray-700">{line}</p>
+                <p key={i} className="text-sm text-gray-700 dark:text-gray-300">{line}</p>
               ))}
             </div>
 
             {risk.recommendations.length > 0 && (
-              <div className="mt-6 bg-blue-50 rounded-lg p-4">
-                <p className="text-sm font-semibold text-gray-800 mb-2">Recommendations:</p>
+              <div className="mt-6 bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4">
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Recommendations:</p>
                 <ul className="space-y-1">
                   {risk.recommendations.map((rec, i) => (
-                    <li key={i} className="text-sm text-gray-700">• {rec}</li>
+                    <li key={i} className="text-sm text-gray-700 dark:text-gray-300">• {rec}</li>
                   ))}
                 </ul>
               </div>
@@ -108,20 +108,20 @@ export function StudentDashboard() {
           {/* Charts Grid */}
           <div className="grid grid-cols-2 gap-6 mb-8">
             {/* Subject Risk Heatmap */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <span className="text-xl">🔥</span>
-                <h2 className="text-lg font-bold text-gray-900">Subject-wise Risk Heatmap</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Subject-wise Risk Heatmap</h2>
               </div>
               <div className="space-y-3">
                 {subjects.map((s) => (
                   <div key={s.code} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">{s.code} — {s.name}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{s.code} — {s.name}</span>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        s.risk_level === "high" ? "bg-red-100 text-red-700" :
-                        s.risk_level === "medium" ? "bg-yellow-100 text-yellow-700" :
-                        "bg-green-100 text-green-700"
+                        s.risk_level === "high" ? "bg-red-100 dark:bg-red-900/40 text-red-700" :
+                        s.risk_level === "medium" ? "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700" :
+                        "bg-green-100 dark:bg-green-900/40 text-green-700"
                       }`}
                     >
                       {s.risk_level.toUpperCase()} RISK
@@ -132,10 +132,10 @@ export function StudentDashboard() {
             </div>
 
             {/* Risk Trend Forecast */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <span className="text-xl">📈</span>
-                <h2 className="text-lg font-bold text-gray-900">Risk Trend Forecast</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Risk Trend Forecast</h2>
               </div>
               {riskTrend.length > 0 ? (
                 <ResponsiveContainer width="100%" height={180}>
@@ -148,10 +148,10 @@ export function StudentDashboard() {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-sm text-gray-500 text-center py-8">Not enough data yet.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">Not enough data yet.</p>
               )}
-              <div className="mt-4 bg-red-50 rounded-lg p-3">
-                <p className="text-xs text-gray-700">
+              <div className="mt-4 bg-red-50 dark:bg-red-900/30 rounded-lg p-3">
+                <p className="text-xs text-gray-700 dark:text-gray-300">
                   <span className="font-semibold">Forecast:</span> {risk.risk_level === "high" ? "If current missed rate continues → risk will keep increasing." : risk.risk_level === "medium" ? "Maintain progress to move to Low Risk." : "You're on track — keep it up!"}
                 </p>
               </div>
@@ -160,10 +160,10 @@ export function StudentDashboard() {
 
           {/* Bottom Charts */}
           <div className="grid grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <span className="text-xl">📊</span>
-                <h2 className="text-lg font-bold text-gray-900">Task Completion Trend</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Task Completion Trend</h2>
               </div>
               {completionTrend.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
@@ -176,14 +176,14 @@ export function StudentDashboard() {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-sm text-gray-500 text-center py-8">Not enough data yet.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">Not enough data yet.</p>
               )}
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <span className="text-xl">⚠️</span>
-                <h2 className="text-lg font-bold text-gray-900">Backlog Growth</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Backlog Growth</h2>
               </div>
               {backlogTrend.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
@@ -198,7 +198,7 @@ export function StudentDashboard() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-sm text-gray-500 text-center py-8">Not enough data yet.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">Not enough data yet.</p>
               )}
             </div>
           </div>

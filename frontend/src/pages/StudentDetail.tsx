@@ -86,7 +86,7 @@ export function StudentDetail() {
   ];
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB]">
+    <div className="flex h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Sidebar role="faculty" items={facultySidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -107,33 +107,33 @@ export function StudentDetail() {
               <Loader2 className="w-8 h-8 animate-spin text-[#6D28D9]" />
             </div>
           ) : error ? (
-            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-700 rounded-2xl p-6 text-center">{error}</div>
           ) : student && risk ? (
           <>
           {/* Profile Card */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm mb-8">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-6">
                 <div className="w-20 h-20 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white text-2xl font-bold">
                   {student.name.charAt(0)}
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-3">{student.name}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{student.name}</h1>
                   <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                       <Mail className="w-4 h-4" />
                       <span className="text-sm">{student.email}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                       <Hash className="w-4 h-4" />
                       <span className="text-sm">ID: {student.student_id}</span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <Calendar className="w-4 h-4" />
                         <span className="text-sm">Year: {student.year}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <Building2 className="w-4 h-4" />
                         <span className="text-sm">{student.department}</span>
                       </div>
@@ -156,8 +156,8 @@ export function StudentDetail() {
           {/* Charts */}
           <div className="grid grid-cols-2 gap-6">
             {/* Task Distribution */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-6">Task Distribution</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Task Distribution</h2>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie data={taskDistribution} cx="50%" cy="50%" innerRadius={70} outerRadius={110} paddingAngle={3} dataKey="value">
@@ -172,15 +172,15 @@ export function StudentDetail() {
                 {taskDistribution.map((item) => (
                   <div key={item.name} className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-sm text-gray-700">{item.name}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{item.name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Subject Risk Levels */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <h2 className="text-lg font-bold text-gray-900 mb-6">Subject Risk Levels</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Subject Risk Levels</h2>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={subjectRisk}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -205,7 +205,7 @@ export function StudentDetail() {
                 ].map((l) => (
                   <div key={l.label} className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: l.color }} />
-                    <span className="text-xs text-gray-700">{l.label}</span>
+                    <span className="text-xs text-gray-700 dark:text-gray-300">{l.label}</span>
                   </div>
                 ))}
               </div>

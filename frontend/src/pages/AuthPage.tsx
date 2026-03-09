@@ -90,7 +90,7 @@ export function AuthPage() {
           Back to Role Selection
         </button>
 
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="p-8 pb-6 text-center">
             <div
@@ -99,20 +99,20 @@ export function AuthPage() {
             >
               <BookOpen className="w-7 h-7" style={{ color: accentColor }} strokeWidth={1.5} />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {isFaculty ? "Faculty" : "Student"} Portal
             </h1>
-            <p className="text-gray-500 text-sm mt-1">AREWS — Academic Risk Early-Warning System</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">AREWS — Academic Risk Early-Warning System</p>
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-200 mx-8">
+          <div className="flex border-b border-gray-200 dark:border-gray-700 mx-8">
             <button
               onClick={() => { setTab("login"); setError(""); }}
               className={`flex-1 pb-3 text-sm font-semibold transition-colors border-b-2 ${
                 tab === "login"
-                  ? "border-current text-gray-900"
-                  : "border-transparent text-gray-400 hover:text-gray-600"
+                  ? "border-current text-gray-900 dark:text-white"
+                  : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
               }`}
               style={tab === "login" ? { color: accentColor, borderColor: accentColor } : {}}
             >
@@ -122,8 +122,8 @@ export function AuthPage() {
               onClick={() => { setTab("signup"); setError(""); }}
               className={`flex-1 pb-3 text-sm font-semibold transition-colors border-b-2 ${
                 tab === "signup"
-                  ? "border-current text-gray-900"
-                  : "border-transparent text-gray-400 hover:text-gray-600"
+                  ? "border-current text-gray-900 dark:text-white"
+                  : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
               }`}
               style={tab === "signup" ? { color: accentColor, borderColor: accentColor } : {}}
             >
@@ -133,7 +133,7 @@ export function AuthPage() {
 
           {/* Error message */}
           {error && (
-            <div className="mx-8 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div className="mx-8 mt-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 rounded-lg text-red-700 text-sm">
               {error}
             </div>
           )}
@@ -142,19 +142,19 @@ export function AuthPage() {
           {tab === "login" && (
             <form onSubmit={handleLogin} className="p-8 pt-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
                 <input
                   type="email"
                   required
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   placeholder="you@university.edu"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                   style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -162,13 +162,13 @@ export function AuthPage() {
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm"
+                    className="w-full px-4 py-2.5 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -184,7 +184,7 @@ export function AuthPage() {
               >
                 {loading ? "Logging in..." : "Log In"}
               </button>
-              <p className="text-center text-sm text-gray-500">
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Don't have an account?{" "}
                 <button type="button" onClick={() => { setTab("signup"); setError(""); }} className="font-semibold hover:underline" style={{ color: accentColor }}>
                   Sign Up
@@ -197,19 +197,19 @@ export function AuthPage() {
           {tab === "signup" && (
             <form onSubmit={handleSignUp} className="p-8 pt-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={isFaculty ? "Dr. Jane Smith" : "John Doe"}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                   style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   {isFaculty ? "Faculty No." : "Reg No."}
                 </label>
                 <input
@@ -218,24 +218,24 @@ export function AuthPage() {
                   value={idNumber}
                   onChange={(e) => setIdNumber(e.target.value)}
                   placeholder={isFaculty ? "FAC-2024-001" : "2024001"}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                   style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
                 <input
                   type="email"
                   required
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
                   placeholder="you@university.edu"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                   style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -244,20 +244,20 @@ export function AuthPage() {
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     placeholder="Min 6 characters"
-                    className="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm"
+                    className="w-full px-4 py-2.5 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Re-enter Password</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Re-enter Password</label>
                 <div className="relative">
                   <input
                     type={showConfirm ? "text" : "password"}
@@ -265,13 +265,13 @@ export function AuthPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm your password"
-                    className="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm"
+                    className="w-full px-4 py-2.5 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
                   >
                     {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -287,7 +287,7 @@ export function AuthPage() {
               >
                 {loading ? "Creating account..." : "Create Account"}
               </button>
-              <p className="text-center text-sm text-gray-500">
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
                 <button type="button" onClick={() => { setTab("login"); setError(""); }} className="font-semibold hover:underline" style={{ color: accentColor }}>
                   Log In

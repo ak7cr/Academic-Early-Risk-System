@@ -41,7 +41,7 @@ export function StudentsOverview() {
   const atRiskPct = students.length > 0 ? Math.round((atRisk / students.length) * 100) : 0;
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB]">
+    <div className="flex h-screen bg-[#F9FAFB] dark:bg-gray-900">
       <Sidebar role="faculty" items={facultySidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -53,7 +53,7 @@ export function StudentsOverview() {
               <Loader2 className="w-8 h-8 animate-spin text-[#6D28D9]" />
             </div>
           ) : error ? (
-            <div className="bg-red-50 text-red-700 rounded-2xl p-6 text-center">{error}</div>
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-700 rounded-2xl p-6 text-center">{error}</div>
           ) : (
           <>
           {/* Summary Cards */}
@@ -71,13 +71,13 @@ export function StudentsOverview() {
           )}
 
           {/* Table */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Student Risk Overview</h2>
-                <p className="text-sm text-gray-600 mt-0.5">Comprehensive view of all students</p>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Student Risk Overview</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Comprehensive view of all students</p>
               </div>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700">
+              <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700">
                 <option>All Students ({students.length})</option>
                 <option>High Risk</option>
                 <option>Medium Risk</option>
@@ -87,44 +87,44 @@ export function StudentsOverview() {
 
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
                   <tr>
                     {["Student", "Student ID", "Risk Level", "Completion Rate", "Missed Deadlines", "Workload", "Actions"].map((h) => (
-                      <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                   {students.map((s) => (
-                    <tr key={s.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={s.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white font-bold">
                             {s.name.charAt(0)}
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{s.name}</div>
-                            <div className="text-xs text-gray-500">{s.email}</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">{s.name}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{s.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{s.student_id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{s.student_id}</td>
                       <td className="px-6 py-4 whitespace-nowrap"><RiskBadge level={s.risk_level as "high" | "medium" | "low"} size="sm" /></td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="w-20 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full ${s.completion_rate < 50 ? "bg-red-500" : s.completion_rate < 75 ? "bg-yellow-500" : "bg-green-500"}`}
                               style={{ width: `${s.completion_rate}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium text-gray-700">{s.completion_rate}%</span>
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{s.completion_rate}%</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`text-sm font-medium ${s.missed_deadlines > 2 ? "text-red-600" : s.missed_deadlines > 0 ? "text-yellow-600" : "text-green-600"}`}>{s.missed_deadlines}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{s.workload_score}/10</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{s.workload_score}/10</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => navigate(`/faculty/student/${s.id}`)}

@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
+import { ThemeProvider } from "./lib/ThemeContext";
 import { RoleSelection } from "./pages/RoleSelection";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { StudentTasks } from "./pages/StudentTasks";
@@ -32,5 +33,9 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
+  );
 }

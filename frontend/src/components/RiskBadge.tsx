@@ -5,9 +5,9 @@ interface RiskBadgeProps {
 
 export function RiskBadge({ level, size = "md" }: RiskBadgeProps) {
   const colors = {
-    high: "bg-red-100 text-red-700 border-red-200",
-    medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    low: "bg-green-100 text-green-700 border-green-200",
+    high: "bg-red-100 dark:bg-red-900/40 text-red-700 border-red-200",
+    medium: "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 border-yellow-200",
+    low: "bg-green-100 dark:bg-green-900/40 text-green-700 border-green-200",
   };
 
   const sizes = {
