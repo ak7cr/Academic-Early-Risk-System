@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { BookOpen, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { BookOpen, Eye, EyeOff, ArrowLeft, Moon, Sun } from "lucide-react";
 import { auth } from "../lib/api";
+import { useTheme } from "../lib/ThemeContext";
 
 type Tab = "login" | "signup";
 
@@ -25,6 +26,7 @@ export function AuthPage() {
   const [signupPassword, setSignupPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const { theme, toggleTheme } = useTheme();
   const isFaculty = role === "faculty";
   const accentColor = isFaculty ? "#9333EA" : "#2563EB";
   const accentHover = isFaculty ? "#7e22ce" : "#1d4ed8";
@@ -79,7 +81,14 @@ export function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#2563EB] via-[#3B82F6] to-[#6366F1] flex items-center justify-center p-8">
+    <div className="min-h-screen bg-linear-to-br from-[#2563EB] via-[#3B82F6] to-[#6366F1] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-8 relative">
+      <button
+        onClick={toggleTheme}
+        className="absolute top-6 right-6 p-2.5 rounded-xl bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
+        aria-label="Toggle dark mode"
+      >
+        {theme === "dark" ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-white" />}
+      </button>
       <div className="w-full max-w-md">
         {/* Back button */}
         <button

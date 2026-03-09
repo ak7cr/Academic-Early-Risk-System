@@ -1,11 +1,20 @@
-import { User, GraduationCap, BookOpen } from "lucide-react";
+import { User, GraduationCap, BookOpen, Moon, Sun } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useTheme } from "../lib/ThemeContext";
 
 export function RoleSelection() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#2563EB] via-[#3B82F6] to-[#6366F1] flex items-center justify-center p-8">
+    <div className="min-h-screen bg-linear-to-br from-[#2563EB] via-[#3B82F6] to-[#6366F1] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-8 relative">
+      <button
+        onClick={toggleTheme}
+        className="absolute top-6 right-6 p-2.5 rounded-xl bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
+        aria-label="Toggle dark mode"
+      >
+        {theme === "dark" ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-white" />}
+      </button>
       <div className="max-w-6xl w-full">
         {/* Header */}
         <div className="text-center mb-16">
