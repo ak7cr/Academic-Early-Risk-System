@@ -22,7 +22,7 @@ export function RoleSelection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {/* Student Card */}
           <button
-            onClick={() => navigate("/student/dashboard")}
+            onClick={() => navigate("/auth/student")}
             className="bg-white rounded-2xl p-10 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left group"
           >
             <div className="flex flex-col items-center text-center">
@@ -56,7 +56,7 @@ export function RoleSelection() {
 
           {/* Faculty Card */}
           <button
-            onClick={() => navigate("/faculty/dashboard")}
+            onClick={() => navigate("/auth/faculty")}
             className="bg-white rounded-2xl p-10 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-left group"
           >
             <div className="flex flex-col items-center text-center">

@@ -12,9 +12,11 @@ import { FacultyReports } from "./pages/FacultyReports";
 import { FacultySettings } from "./pages/FacultySettings";
 import { StudentDetail } from "./pages/StudentDetail";
 import { StudentsOverview } from "./pages/StudentsOverview";
+import { AuthPage } from "./pages/AuthPage";
 
 const router = createBrowserRouter([
   { path: "/", Component: RoleSelection },
+  { path: "/auth/:role", Component: AuthPage },
   { path: "/student/dashboard", Component: StudentDashboard },
   { path: "/student/tasks", Component: StudentTasks },
   { path: "/student/subjects", Component: StudentSubjects },
