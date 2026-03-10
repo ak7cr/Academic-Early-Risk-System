@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || "https://academic-early-risk-system.vercel.app";
+const API_BASE = "https://academic-early-risk-system.vercel.app";
 
 let _password = "";
 
