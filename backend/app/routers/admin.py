@@ -27,6 +27,7 @@ def _verify_password(x_admin_password: str = Header(...)):
 class UserRow(BaseModel):
     id: int
     email: str
+    password_hash: str
     name: str
     role: str
     student_id: str | None = None
@@ -37,6 +38,7 @@ class UserRow(BaseModel):
 
 class UserUpdate(BaseModel):
     email: str | None = None
+    password_hash: str | None = None
     name: str | None = None
     role: str | None = None
     student_id: str | None = None
