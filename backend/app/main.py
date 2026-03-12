@@ -18,6 +18,10 @@ try:
     if "password_plain" not in _cols:
         with engine.begin() as _conn:
             _conn.execute(text("ALTER TABLE users ADD COLUMN password_plain VARCHAR(256)"))
+    # Backfill password_plain for existing users
+    with engine.begin() as _conn:
+        _conn.execute(text("UPDATE users SET password_plain = 'faculty123' WHERE role = 'faculty' AND password_plain IS NULL"))
+        _conn.execute(text("UPDATE users SET password_plain = 'student123' WHERE role = 'student' AND password_plain IS NULL"))
     _db = SessionLocal()
     try:
         seed_database(_db)
