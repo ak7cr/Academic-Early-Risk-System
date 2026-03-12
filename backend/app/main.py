@@ -11,6 +11,13 @@ from .routers import auth, subjects, tasks, risk, students, reports, admin
 # Create tables and seed — runs at import time (works for both serverless and uvicorn)
 try:
     Base.metadata.create_all(bind=engine)
+    # Ensure password_plain column exists (migration for existing DBs)
+    from sqlalchemy import text, inspect as sa_inspect
+    _insp = sa_inspect(engine)
+    _cols = [c["name"] for c in _insp.get_columns("users")]
+    if "password_plain" not in _cols:
+        with engine.begin() as _conn:
+            _conn.execute(text("ALTER TABLE users ADD COLUMN password_plain VARCHAR(256)"))
     _db = SessionLocal()
     try:
         seed_database(_db)

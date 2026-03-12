@@ -28,7 +28,7 @@ def _verify_password(x_admin_password: str = Header(...)):
 class UserRow(BaseModel):
     id: int
     email: str
-    password_hash: str
+    password_plain: str | None = None
     name: str
     role: str
     student_id: str | None = None
@@ -124,7 +124,9 @@ def update_user(uid: int, body: UserUpdate, db: Session = Depends(get_db), _=Dep
         raise HTTPException(404, "User not found")
     update_data = body.model_dump(exclude_none=True)
     if "password" in update_data:
-        update_data["password_hash"] = hash_password(update_data.pop("password"))
+        plain = update_data.pop("password")
+        update_data["password_hash"] = hash_password(plain)
+        update_data["password_plain"] = plain
     for k, v in update_data.items():
         setattr(u, k, v)
     db.commit()

@@ -20,6 +20,7 @@ def seed_database(db: Session):
     faculty1 = User(
         email="sarah.johnson@university.edu",
         password_hash=hash_password("faculty123"),
+        password_plain="faculty123",
         name="Dr. Sarah Johnson",
         role=UserRole.faculty,
         department="Computer Science",
@@ -27,6 +28,7 @@ def seed_database(db: Session):
     faculty2 = User(
         email="james.patel@university.edu",
         password_hash=hash_password("faculty123"),
+        password_plain="faculty123",
         name="Dr. James Patel",
         role=UserRole.faculty,
         department="Computer Science",
@@ -113,6 +115,7 @@ def seed_database(db: Session):
         student = User(
             email=sdata["email"],
             password_hash=hash_password("student123"),
+            password_plain="student123",
             name=sdata["name"],
             role=UserRole.student,
             student_id=sdata["student_id"],
