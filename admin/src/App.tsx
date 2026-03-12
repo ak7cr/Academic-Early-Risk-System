@@ -16,8 +16,8 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
     try {
       await api.login();
       onAuth();
-    } catch {
-      setError("Wrong password");
+    } catch (err: any) {
+      setError(err?.message || "Wrong password");
       setAdminPassword("");
     } finally {
       setLoading(false);
