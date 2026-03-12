@@ -56,8 +56,10 @@ type Column = {
   key: string;
   label: string;
   editable?: boolean;
-  type?: "text" | "select";
+  type?: "text" | "select" | "secret";
   options?: string[];
+  /** For secret columns: the key used when sending edits (e.g. "password" instead of "password_hash") */
+  editKey?: string;
 };
 
 function DataTable({
@@ -78,12 +80,19 @@ function DataTable({
   const [editId, setEditId] = useState<number | null>(null);
   const [editData, setEditData] = useState<Record<string, any>>({});
   const [busy, setBusy] = useState(false);
+  const [revealedSecrets, setRevealedSecrets] = useState<Record<string, boolean>>({});
 
   function startEdit(row: Record<string, any>) {
     setEditId(row.id);
     const data: Record<string, any> = {};
     columns.forEach((c) => {
-      if (c.editable) data[c.key] = row[c.key] ?? "";
+      if (c.editable) {
+        if (c.type === "secret") {
+          data[c.editKey || c.key] = "";
+        } else {
+          data[c.key] = row[c.key] ?? "";
+        }
+      }
     });
     setEditData(data);
   }
@@ -92,7 +101,15 @@ function DataTable({
     if (editId == null || !onSave) return;
     setBusy(true);
     try {
-      await onSave(editId, editData);
+      // Filter out empty secret fields so we don't overwrite with blank
+      const payload = { ...editData };
+      columns.forEach((c) => {
+        if (c.type === "secret") {
+          const sendKey = c.editKey || c.key;
+          if (!payload[sendKey]) delete payload[sendKey];
+        }
+      });
+      await onSave(editId, payload);
       setEditId(null);
       onRefresh();
     } catch (e: any) {
@@ -145,6 +162,14 @@ function DataTable({
                         >
                           {c.options?.map((o) => <option key={o} value={o}>{o}</option>)}
                         </select>
+                      ) : c.type === "secret" ? (
+                        <input
+                          type="text"
+                          value={editData[c.editKey || c.key] || ""}
+                          onChange={(e) => setEditData({ ...editData, [c.editKey || c.key]: e.target.value })}
+                          placeholder="leave blank to keep"
+                          className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-sm w-full min-w-[80px] placeholder-gray-500"
+                        />
                       ) : (
                         <input
                           value={editData[c.key] || ""}
@@ -152,6 +177,21 @@ function DataTable({
                           className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-sm w-full min-w-[80px]"
                         />
                       )
+                    ) : c.type === "secret" ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="font-mono text-xs">
+                          {revealedSecrets[`${row.id}-${c.key}`]
+                            ? String(row[c.key] ?? "—")
+                            : "••••••••"}
+                        </span>
+                        <button
+                          onClick={() => setRevealedSecrets((prev) => ({ ...prev, [`${row.id}-${c.key}`]: !prev[`${row.id}-${c.key}`] }))}
+                          className="text-gray-500 hover:text-gray-300 transition-colors ml-1"
+                          title={revealedSecrets[`${row.id}-${c.key}`] ? "Hide" : "Show"}
+                        >
+                          {revealedSecrets[`${row.id}-${c.key}`] ? "🙈" : "👁"}
+                        </button>
+                      </span>
                     ) : (
                       <span className={c.key === "id" ? "text-gray-500" : ""}>{formatCell(c.key, row[c.key])}</span>
                     )}
@@ -204,7 +244,7 @@ function formatCell(key: string, value: unknown): string {
 const userCols: Column[] = [
   { key: "id", label: "ID" },
   { key: "email", label: "Email", editable: true },
-  { key: "password", label: "Password", editable: true },
+  { key: "password_hash", label: "Password", editable: true, type: "secret", editKey: "password" },
   { key: "name", label: "Name", editable: true },
   { key: "role", label: "Role", editable: true, type: "select", options: ["student", "faculty"] },
   { key: "student_id", label: "ID", editable: true },
