@@ -206,7 +206,7 @@ const userCols: Column[] = [
   { key: "email", label: "Email", editable: true },
   { key: "name", label: "Name", editable: true },
   { key: "role", label: "Role", editable: true, type: "select", options: ["student", "faculty"] },
-  { key: "student_id", label: "Student ID", editable: true },
+  { key: "student_id", label: "ID", editable: true },
   { key: "department", label: "Dept", editable: true },
   { key: "year", label: "Year", editable: true },
   { key: "created_at", label: "Created" },
