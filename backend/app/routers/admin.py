@@ -11,6 +11,7 @@ from datetime import datetime
 
 from ..database import get_db
 from ..models import User, Subject, Task, RiskHistory
+from ..auth import hash_password
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -27,7 +28,6 @@ def _verify_password(x_admin_password: str = Header(...)):
 class UserRow(BaseModel):
     id: int
     email: str
-    password_hash: str
     name: str
     role: str
     student_id: str | None = None
@@ -38,7 +38,7 @@ class UserRow(BaseModel):
 
 class UserUpdate(BaseModel):
     email: str | None = None
-    password_hash: str | None = None
+    password: str | None = None
     name: str | None = None
     role: str | None = None
     student_id: str | None = None
@@ -121,7 +121,10 @@ def update_user(uid: int, body: UserUpdate, db: Session = Depends(get_db), _=Dep
     u = db.get(User, uid)
     if not u:
         raise HTTPException(404, "User not found")
-    for k, v in body.model_dump(exclude_none=True).items():
+    update_data = body.model_dump(exclude_none=True)
+    if "password" in update_data:
+        update_data["password_hash"] = hash_password(update_data.pop("password"))
+    for k, v in update_data.items():
         setattr(u, k, v)
     db.commit()
     db.refresh(u)

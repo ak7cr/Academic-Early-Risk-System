@@ -204,7 +204,7 @@ function formatCell(key: string, value: unknown): string {
 const userCols: Column[] = [
   { key: "id", label: "ID" },
   { key: "email", label: "Email", editable: true },
-  { key: "password_hash", label: "Password Hash", editable: true },
+  { key: "password", label: "Password", editable: true },
   { key: "name", label: "Name", editable: true },
   { key: "role", label: "Role", editable: true, type: "select", options: ["student", "faculty"] },
   { key: "student_id", label: "ID", editable: true },
