@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText, Loader2, Play } from "lucide-react";
+import { LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText, Settings, Loader2, Play } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
 import { riskApi, type RiskResult, type User } from "../lib/api";
@@ -11,6 +11,7 @@ const sidebarItems = [
   { icon: Calculator, label: "What-If Simulator", path: "/student/simulator" },
   { icon: HeartPulse, label: "Recovery Plan", path: "/student/recovery" },
   { icon: FileText, label: "Reports", path: "/student/reports" },
+  { icon: Settings, label: "Settings", path: "/student/settings" },
 ];
 
 export function StudentSimulator() {

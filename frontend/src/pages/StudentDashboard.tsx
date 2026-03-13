@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText,
+  LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText, Settings,
   AlertCircle, CheckCircle2, Clock, TrendingUp, Loader2,
 } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
@@ -19,6 +19,7 @@ const sidebarItems = [
   { icon: Calculator, label: "What-If Simulator", path: "/student/simulator" },
   { icon: HeartPulse, label: "Recovery Plan", path: "/student/recovery" },
   { icon: FileText, label: "Reports", path: "/student/reports" },
+  { icon: Settings, label: "Settings", path: "/student/settings" },
 ];
 
 interface SubjectWithRisk { code: string; name: string; risk_level: string; }

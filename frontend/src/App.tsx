@@ -7,6 +7,7 @@ import { StudentSubjects } from "./pages/StudentSubjects";
 import { StudentSimulator } from "./pages/StudentSimulator";
 import { StudentRecovery } from "./pages/StudentRecovery";
 import { StudentReports } from "./pages/StudentReports";
+import { StudentSettings } from "./pages/StudentSettings";
 import { FacultyDashboard } from "./pages/FacultyDashboard";
 import { FacultyAnalytics } from "./pages/FacultyAnalytics";
 import { FacultyReports } from "./pages/FacultyReports";
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
   { path: "/student/simulator", Component: StudentSimulator },
   { path: "/student/recovery", Component: StudentRecovery },
   { path: "/student/reports", Component: StudentReports },
+  { path: "/student/settings", Component: StudentSettings },
   { path: "/faculty/dashboard", Component: FacultyDashboard },
   { path: "/faculty/students", Component: StudentsOverview },
   { path: "/faculty/analytics", Component: FacultyAnalytics },
