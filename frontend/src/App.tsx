@@ -14,6 +14,7 @@ import { FacultySettings } from "./pages/FacultySettings";
 import { StudentDetail } from "./pages/StudentDetail";
 import { StudentsOverview } from "./pages/StudentsOverview";
 import { AuthPage } from "./pages/AuthPage";
+import { FacultyPriority } from "./pages/FacultyPriority";
 
 const router = createBrowserRouter([
   { path: "/", Component: RoleSelection },
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
   { path: "/faculty/reports", Component: FacultyReports },
   { path: "/faculty/settings", Component: FacultySettings },
   { path: "/faculty/student/:id", Component: StudentDetail },
+    { path: "/faculty/priority", Component: FacultyPriority },
 ]);
 
 export default function App() {

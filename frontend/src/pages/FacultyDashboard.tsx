@@ -118,7 +118,7 @@ export function FacultyDashboard() {
 
           {/* Quick Action Cards */}
           <div className="grid grid-cols-3 gap-6 mt-8">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/faculty/analytics")}>
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                   <BarChart3 className="w-6 h-6 text-[#2563EB]" />
@@ -130,7 +130,7 @@ export function FacultyDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/faculty/reports")}>
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
                   <FileText className="w-6 h-6 text-[#16A34A]" />
@@ -142,7 +142,7 @@ export function FacultyDashboard() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/faculty/priority")}>
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">
                   <AlertTriangle className="w-6 h-6 text-[#DC2626]" />
