@@ -36,6 +36,16 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class UserMeUpdate(BaseModel):
+    email: str | None = None
+    password: str | None = None
+    name: str | None = None
+    role: str | None = None
+    student_id: str | None = None
+    department: str | None = None
+    year: int | None = None
+
+
 # --- Subjects ---
 class SubjectCreate(BaseModel):
     code: str

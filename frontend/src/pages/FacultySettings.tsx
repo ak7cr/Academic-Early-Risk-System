@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { LayoutDashboard, Users, BarChart3, FileText, Settings } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
-import type { User } from "../lib/api";
+import { auth, type User } from "../lib/api";
+import { useNavigate } from "react-router";
 
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
@@ -12,7 +14,44 @@ const facultySidebar = [
 ];
 
 export function FacultySettings() {
+  const navigate = useNavigate();
   const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [role, setRole] = useState<"student" | "faculty">((user?.role as "student" | "faculty") || "faculty");
+  const [password, setPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  async function saveProfile() {
+    setError("");
+    setSuccess("");
+    if (!name.trim() || !email.trim()) {
+      setError("Name and email are required.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const updated = await auth.updateMe({
+        name: name.trim(),
+        email: email.trim(),
+        role,
+        ...(password.trim() ? { password: password.trim() } : {}),
+      });
+      localStorage.setItem("user", JSON.stringify(updated));
+      setPassword("");
+      setSuccess("Profile updated successfully.");
+      if (updated.role === "student") {
+        navigate("/student/dashboard");
+      }
+    } catch (e: any) {
+      setError(e?.message || "Failed to update profile.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="flex h-screen bg-[#F9FAFB] dark:bg-gray-900">
@@ -25,22 +64,55 @@ export function FacultySettings() {
             <div className="space-y-4">
               <div>
                 <label className="text-sm text-gray-500 dark:text-gray-400">Name</label>
-                <p className="text-gray-900 dark:text-white font-medium">{user?.name || "—"}</p>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="Enter your name"
+                />
               </div>
               <div>
                 <label className="text-sm text-gray-500 dark:text-gray-400">Email</label>
-                <p className="text-gray-900 dark:text-white font-medium">{user?.email || "—"}</p>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="Enter your email"
+                />
               </div>
               <div>
                 <label className="text-sm text-gray-500 dark:text-gray-400">Role</label>
-                <p className="text-gray-900 dark:text-white font-medium capitalize">{user?.role || "—"}</p>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as "student" | "faculty")}
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="faculty">Faculty</option>
+                  <option value="student">Student</option>
+                </select>
               </div>
-              {user?.department && (
                 <div>
-                  <label className="text-sm text-gray-500 dark:text-gray-400">Department</label>
-                  <p className="text-gray-900 dark:text-white font-medium">{user.department}</p>
+                  <label className="text-sm text-gray-500 dark:text-gray-400">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="Leave blank to keep current password"
+                  />
                 </div>
-              )}
+
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              {success && <p className="text-sm text-green-600">{success}</p>}
+
+              <button
+                onClick={saveProfile}
+                disabled={saving}
+                className="w-full mt-2 px-4 py-2.5 bg-[#2563EB] text-white rounded-lg font-medium hover:bg-[#1d4ed8] transition-colors disabled:opacity-60"
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
             </div>
           </div>
         </div>

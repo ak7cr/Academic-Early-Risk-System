@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import User, UserRole
-from ..schemas import UserCreate, UserOut, Token, LoginRequest
+from ..schemas import UserCreate, UserOut, Token, LoginRequest, UserMeUpdate
 from ..auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -54,4 +54,38 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserOut)
 def get_me(current_user: User = Depends(get_current_user)):
+    return UserOut.model_validate(current_user)
+
+
+@router.patch("/me", response_model=UserOut)
+def update_me(
+    data: UserMeUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    update_data = data.model_dump(exclude_none=True)
+
+    if "email" in update_data:
+        exists = db.query(User).filter(User.email == update_data["email"], User.id != current_user.id).first()
+        if exists:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+    if "student_id" in update_data and update_data["student_id"]:
+        sid_exists = db.query(User).filter(User.student_id == update_data["student_id"], User.id != current_user.id).first()
+        if sid_exists:
+            raise HTTPException(status_code=400, detail="Student ID already exists")
+
+    if "role" in update_data:
+        update_data["role"] = UserRole(update_data["role"])
+
+    if "password" in update_data:
+        plain = update_data.pop("password")
+        update_data["password_hash"] = hash_password(plain)
+        update_data["password_plain"] = plain
+
+    for k, v in update_data.items():
+        setattr(current_user, k, v)
+
+    db.commit()
+    db.refresh(current_user)
     return UserOut.model_validate(current_user)

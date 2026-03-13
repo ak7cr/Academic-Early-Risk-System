@@ -64,6 +64,15 @@ export const auth = {
     year?: number;
   }) => api.post<AuthResponse>("/api/auth/register", data),
   me: () => api.get<User>("/api/auth/me"),
+  updateMe: (data: {
+    email?: string;
+    password?: string;
+    name?: string;
+    role?: "student" | "faculty";
+    student_id?: string;
+    department?: string;
+    year?: number;
+  }) => api.patch<User>("/api/auth/me", data),
 };
 
 // --- Risk ---
