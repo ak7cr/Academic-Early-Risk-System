@@ -66,6 +66,7 @@ function DataTable({
   title,
   columns,
   rows,
+  onCreate,
   onSave,
   onDelete,
   onRefresh,
@@ -73,6 +74,7 @@ function DataTable({
   title: string;
   columns: Column[];
   rows: Record<string, any>[];
+  onCreate?: (data: Record<string, unknown>) => Promise<void>;
   onSave?: (id: number, data: Record<string, unknown>) => Promise<void>;
   onDelete?: (id: number) => Promise<void>;
   onRefresh: () => void;
@@ -81,6 +83,34 @@ function DataTable({
   const [editData, setEditData] = useState<Record<string, any>>({});
   const [busy, setBusy] = useState(false);
   const [revealedSecrets, setRevealedSecrets] = useState<Record<string, boolean>>({});
+  const [adding, setAdding] = useState(false);
+  const [addData, setAddData] = useState<Record<string, any>>({});
+
+  function startAdd() {
+    const data: Record<string, any> = {};
+    columns.forEach((c) => {
+      if (c.editable) {
+        data[c.editKey || c.key] = "";
+      }
+    });
+    setAddData(data);
+    setAdding(true);
+  }
+
+  async function createRow() {
+    if (!onCreate) return;
+    setBusy(true);
+    try {
+      await onCreate(addData);
+      setAdding(false);
+      setAddData({});
+      onRefresh();
+    } catch (e: any) {
+      alert(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
 
   function startEdit(row: Record<string, any>) {
     setEditId(row.id);
@@ -136,7 +166,12 @@ function DataTable({
     <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
         <h2 className="text-lg font-bold text-white">{title} <span className="text-gray-500 font-normal text-sm">({rows.length})</span></h2>
-        <button onClick={onRefresh} className="text-sm text-blue-400 hover:text-blue-300 transition-colors">Refresh</button>
+        <div className="flex gap-3">
+          {onCreate && !adding && (
+            <button onClick={startAdd} className="text-sm text-green-400 hover:text-green-300 transition-colors">+ Add</button>
+          )}
+          <button onClick={onRefresh} className="text-sm text-blue-400 hover:text-blue-300 transition-colors">Refresh</button>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -149,6 +184,42 @@ function DataTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
+            {/* Add row */}
+            {adding && (
+              <tr className="bg-green-900/20">
+                {columns.map((c) => (
+                  <td key={c.key} className="px-4 py-3 whitespace-nowrap">
+                    {c.key === "id" ? (
+                      <span className="text-gray-500 text-xs">auto</span>
+                    ) : c.editable ? (
+                      c.type === "select" ? (
+                        <select
+                          value={addData[c.key] || ""}
+                          onChange={(e) => setAddData({ ...addData, [c.key]: e.target.value })}
+                          className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-sm"
+                        >
+                          <option value="">Select...</option>
+                          {c.options?.map((o) => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      ) : (
+                        <input
+                          value={addData[c.editKey || c.key] || ""}
+                          onChange={(e) => setAddData({ ...addData, [c.editKey || c.key]: e.target.value })}
+                          placeholder={c.label}
+                          className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-sm w-full min-w-[80px] placeholder-gray-500"
+                        />
+                      )
+                    ) : (
+                      <span className="text-gray-500 text-xs">—</span>
+                    )}
+                  </td>
+                ))}
+                <td className="px-4 py-3 whitespace-nowrap text-right space-x-2">
+                  <button onClick={createRow} disabled={busy} className="text-green-400 hover:text-green-300 text-xs font-medium">Create</button>
+                  <button onClick={() => setAdding(false)} className="text-gray-400 hover:text-gray-300 text-xs font-medium">Cancel</button>
+                </td>
+              </tr>
+            )}
             {rows.map((row) => (
               <tr key={row.id} className="hover:bg-gray-800/50 transition-colors">
                 {columns.map((c) => (
@@ -265,8 +336,8 @@ const subjectCols: Column[] = [
 const taskCols: Column[] = [
   { key: "id", label: "ID" },
   { key: "title", label: "Title", editable: true },
-  { key: "subject_id", label: "Subject ID" },
-  { key: "student_id", label: "Student ID" },
+  { key: "subject_id", label: "Subject ID", editable: true },
+  { key: "student_id", label: "Student ID", editable: true },
   { key: "task_type", label: "Type", editable: true, type: "select", options: ["assignment", "exam", "task"] },
   { key: "status", label: "Status", editable: true, type: "select", options: ["pending", "completed", "overdue"] },
   { key: "due_date", label: "Due Date", editable: true },
@@ -277,11 +348,11 @@ const taskCols: Column[] = [
 
 const riskCols: Column[] = [
   { key: "id", label: "ID" },
-  { key: "student_id", label: "Student ID" },
-  { key: "risk_level", label: "Risk Level" },
-  { key: "completion_rate", label: "Completion %" },
-  { key: "overdue_tasks", label: "Overdue" },
-  { key: "workload_score", label: "Workload" },
+  { key: "student_id", label: "Student ID", editable: true },
+  { key: "risk_level", label: "Risk Level", editable: true, type: "select", options: ["low", "medium", "high"] },
+  { key: "completion_rate", label: "Completion %", editable: true },
+  { key: "overdue_tasks", label: "Overdue", editable: true },
+  { key: "workload_score", label: "Workload", editable: true },
   { key: "computed_at", label: "Computed At" },
 ];
 
@@ -396,6 +467,7 @@ export default function App() {
             title="Users"
             columns={userCols}
             rows={data.users}
+            onCreate={async (d) => { await api.createUser(d); }}
             onSave={async (id, d) => { await api.updateUser(id, d); }}
             onDelete={async (id) => { await api.deleteUser(id); }}
             onRefresh={() => { loadTab("users"); loadStats(); }}
@@ -407,6 +479,7 @@ export default function App() {
             title="Subjects"
             columns={subjectCols}
             rows={data.subjects}
+            onCreate={async (d) => { await api.createSubject(d); }}
             onSave={async (id, d) => { await api.updateSubject(id, d); }}
             onDelete={async (id) => { await api.deleteSubject(id); }}
             onRefresh={() => { loadTab("subjects"); loadStats(); }}
@@ -418,6 +491,7 @@ export default function App() {
             title="Tasks"
             columns={taskCols}
             rows={data.tasks}
+            onCreate={async (d) => { await api.createTask(d); }}
             onSave={async (id, d) => { await api.updateTask(id, d); }}
             onDelete={async (id) => { await api.deleteTask(id); }}
             onRefresh={() => { loadTab("tasks"); loadStats(); }}
@@ -429,6 +503,7 @@ export default function App() {
             title="Risk History"
             columns={riskCols}
             rows={data.risk_history}
+            onCreate={async (d) => { await api.createRisk(d); }}
             onDelete={async (id) => { await api.deleteRisk(id); }}
             onRefresh={() => { loadTab("risk_history"); loadStats(); }}
           />

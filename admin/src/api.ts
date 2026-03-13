@@ -32,6 +32,8 @@ export const api = {
 
   // Users
   users: () => request<any[]>("/api/admin/users"),
+  createUser: (data: Record<string, unknown>) =>
+    request<any>("/api/admin/users", { method: "POST", body: JSON.stringify(data) }),
   updateUser: (id: number, data: Record<string, unknown>) =>
     request<any>(`/api/admin/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteUser: (id: number) =>
@@ -39,6 +41,8 @@ export const api = {
 
   // Subjects
   subjects: () => request<any[]>("/api/admin/subjects"),
+  createSubject: (data: Record<string, unknown>) =>
+    request<any>("/api/admin/subjects", { method: "POST", body: JSON.stringify(data) }),
   updateSubject: (id: number, data: Record<string, unknown>) =>
     request<any>(`/api/admin/subjects/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteSubject: (id: number) =>
@@ -46,6 +50,8 @@ export const api = {
 
   // Tasks
   tasks: () => request<any[]>("/api/admin/tasks"),
+  createTask: (data: Record<string, unknown>) =>
+    request<any>("/api/admin/tasks", { method: "POST", body: JSON.stringify(data) }),
   updateTask: (id: number, data: Record<string, unknown>) =>
     request<any>(`/api/admin/tasks/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteTask: (id: number) =>
@@ -53,6 +59,8 @@ export const api = {
 
   // Risk History
   riskHistory: () => request<any[]>("/api/admin/risk_history"),
+  createRisk: (data: Record<string, unknown>) =>
+    request<any>("/api/admin/risk_history", { method: "POST", body: JSON.stringify(data) }),
   deleteRisk: (id: number) =>
     request<any>(`/api/admin/risk_history/${id}`, { method: "DELETE" }),
 };

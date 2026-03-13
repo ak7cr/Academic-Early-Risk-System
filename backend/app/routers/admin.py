@@ -46,6 +46,15 @@ class UserUpdate(BaseModel):
     department: str | None = None
     year: int | None = None
 
+class UserCreate(BaseModel):
+    email: str
+    password: str
+    name: str
+    role: str
+    student_id: str | None = None
+    department: str | None = None
+    year: int | None = None
+
 class SubjectRow(BaseModel):
     id: int
     code: str
@@ -59,6 +68,12 @@ class SubjectUpdate(BaseModel):
     code: str | None = None
     name: str | None = None
     student_id: int | None = None
+    semester: str | None = None
+
+class SubjectCreate(BaseModel):
+    code: str
+    name: str
+    student_id: int
     semester: str | None = None
 
 class TaskRow(BaseModel):
@@ -84,6 +99,15 @@ class TaskUpdate(BaseModel):
     status: str | None = None
     completed_at: datetime | None = None
 
+class TaskCreate(BaseModel):
+    title: str
+    subject_id: int
+    student_id: int
+    task_type: str
+    due_date: datetime
+    estimated_hours: float = 1.0
+    status: str = "pending"
+
 class RiskRow(BaseModel):
     id: int
     student_id: int
@@ -93,6 +117,13 @@ class RiskRow(BaseModel):
     workload_score: float
     computed_at: datetime | None = None
     model_config = {"from_attributes": True}
+
+class RiskCreate(BaseModel):
+    student_id: int
+    risk_level: str
+    completion_rate: float = 0.0
+    overdue_tasks: int = 0
+    workload_score: float = 0.0
 
 
 # ── Auth check ──────────────────────────────────────────────
@@ -109,6 +140,24 @@ def admin_login(x_admin_password: str = Header(...)):
 @router.get("/users", response_model=list[UserRow])
 def list_users(db: Session = Depends(get_db), _=Depends(_verify_password)):
     return db.query(User).order_by(User.id).all()
+
+@router.post("/users", response_model=UserRow)
+def create_user(body: UserCreate, db: Session = Depends(get_db), _=Depends(_verify_password)):
+    from ..models import UserRole
+    u = User(
+        email=body.email,
+        password_hash=hash_password(body.password),
+        password_plain=body.password,
+        name=body.name,
+        role=UserRole(body.role),
+        student_id=body.student_id,
+        department=body.department,
+        year=body.year,
+    )
+    db.add(u)
+    db.commit()
+    db.refresh(u)
+    return u
 
 @router.get("/users/{uid}", response_model=UserRow)
 def get_user(uid: int, db: Session = Depends(get_db), _=Depends(_verify_password)):
@@ -149,6 +198,19 @@ def delete_user(uid: int, db: Session = Depends(get_db), _=Depends(_verify_passw
 def list_subjects(db: Session = Depends(get_db), _=Depends(_verify_password)):
     return db.query(Subject).order_by(Subject.id).all()
 
+@router.post("/subjects", response_model=SubjectRow)
+def create_subject(body: SubjectCreate, db: Session = Depends(get_db), _=Depends(_verify_password)):
+    s = Subject(
+        code=body.code,
+        name=body.name,
+        student_id=body.student_id,
+        semester=body.semester,
+    )
+    db.add(s)
+    db.commit()
+    db.refresh(s)
+    return s
+
 @router.patch("/subjects/{sid}", response_model=SubjectRow)
 def update_subject(sid: int, body: SubjectUpdate, db: Session = Depends(get_db), _=Depends(_verify_password)):
     s = db.get(Subject, sid)
@@ -176,6 +238,23 @@ def delete_subject(sid: int, db: Session = Depends(get_db), _=Depends(_verify_pa
 def list_tasks(db: Session = Depends(get_db), _=Depends(_verify_password)):
     return db.query(Task).order_by(Task.id).all()
 
+@router.post("/tasks", response_model=TaskRow)
+def create_task(body: TaskCreate, db: Session = Depends(get_db), _=Depends(_verify_password)):
+    from ..models import TaskType, TaskStatus
+    t = Task(
+        title=body.title,
+        subject_id=body.subject_id,
+        student_id=body.student_id,
+        task_type=TaskType(body.task_type),
+        due_date=body.due_date,
+        estimated_hours=body.estimated_hours,
+        status=TaskStatus(body.status),
+    )
+    db.add(t)
+    db.commit()
+    db.refresh(t)
+    return t
+
 @router.patch("/tasks/{tid}", response_model=TaskRow)
 def update_task(tid: int, body: TaskUpdate, db: Session = Depends(get_db), _=Depends(_verify_password)):
     t = db.get(Task, tid)
@@ -202,6 +281,21 @@ def delete_task(tid: int, db: Session = Depends(get_db), _=Depends(_verify_passw
 @router.get("/risk_history", response_model=list[RiskRow])
 def list_risk_history(db: Session = Depends(get_db), _=Depends(_verify_password)):
     return db.query(RiskHistory).order_by(RiskHistory.id).all()
+
+@router.post("/risk_history", response_model=RiskRow)
+def create_risk_history(body: RiskCreate, db: Session = Depends(get_db), _=Depends(_verify_password)):
+    from ..models import RiskLevel
+    r = RiskHistory(
+        student_id=body.student_id,
+        risk_level=RiskLevel(body.risk_level),
+        completion_rate=body.completion_rate,
+        overdue_tasks=body.overdue_tasks,
+        workload_score=body.workload_score,
+    )
+    db.add(r)
+    db.commit()
+    db.refresh(r)
+    return r
 
 @router.delete("/risk_history/{rid}")
 def delete_risk_history(rid: int, db: Session = Depends(get_db), _=Depends(_verify_password)):
