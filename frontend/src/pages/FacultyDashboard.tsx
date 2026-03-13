@@ -55,27 +55,27 @@ export function FacultyDashboard() {
                 className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => navigate(`/faculty/student/${student.id}`)}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 flex-1">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="w-12 h-12 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white font-bold text-lg">
                       {student.name.charAt(0)}
                     </div>
-                    <div>
-                      <h3 className="font-bold text-gray-900 dark:text-white">{student.name}</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{student.email}</p>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-gray-900 dark:text-white truncate">{student.name}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{student.email}</p>
                     </div>
                   </div>
 
-                  <div className="text-center px-6">
+                  <div className="text-center px-2 w-28 shrink-0">
                     <p className="text-xs text-gray-500 dark:text-gray-400">Student ID</p>
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{student.student_id}</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{student.student_id}</p>
                   </div>
 
-                  <div className="px-6">
+                  <div className="px-2 w-24 shrink-0 flex justify-center">
                     <RiskBadge level={student.risk_level as "high" | "medium" | "low"} size="md" />
                   </div>
 
-                  <div className="px-6">
+                  <div className="px-2 w-44 shrink-0">
                     <div className="flex items-center gap-2">
                       <div className="w-24 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                         <div
@@ -87,11 +87,11 @@ export function FacultyDashboard() {
                           style={{ width: `${student.completion_rate}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-12">{student.completion_rate}%</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-10">{student.completion_rate}%</span>
                     </div>
                   </div>
 
-                  <div className="text-center px-6">
+                    <div className="text-center px-2 w-24 shrink-0">
                     <p className={`text-lg font-bold ${
                       student.missed_deadlines > 2 ? "text-red-600" :
                       student.missed_deadlines > 0 ? "text-yellow-600" :
@@ -101,13 +101,13 @@ export function FacultyDashboard() {
                     </p>
                   </div>
 
-                  <div className="text-center px-6">
+                  <div className="text-center px-2 w-20 shrink-0">
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{student.workload_score}/10</p>
                   </div>
 
                   <button
                     onClick={(e) => { e.stopPropagation(); navigate(`/faculty/student/${student.id}`); }}
-                    className="px-5 py-2.5 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1d4ed8] transition-colors"
+                    className="px-4 py-2.5 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1d4ed8] transition-colors shrink-0 whitespace-nowrap"
                   >
                     View Details
                   </button>

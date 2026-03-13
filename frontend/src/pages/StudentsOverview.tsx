@@ -86,7 +86,16 @@ export function StudentsOverview() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full table-fixed min-w-[980px]">
+                <colgroup>
+                  <col className="w-[300px]" />
+                  <col className="w-[120px]" />
+                  <col className="w-[120px]" />
+                  <col className="w-[180px]" />
+                  <col className="w-[140px]" />
+                  <col className="w-[100px]" />
+                  <col className="w-[140px]" />
+                </colgroup>
                 <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
                   <tr>
                     {["Student", "Student ID", "Risk Level", "Completion Rate", "Missed Deadlines", "Workload", "Actions"].map((h) => (
@@ -102,13 +111,13 @@ export function StudentsOverview() {
                           <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white font-bold">
                             {s.name.charAt(0)}
                           </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">{s.name}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">{s.email}</div>
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{s.name}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{s.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{s.student_id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 truncate">{s.student_id}</td>
                       <td className="px-6 py-4 whitespace-nowrap"><RiskBadge level={s.risk_level as "high" | "medium" | "low"} size="sm" /></td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -128,7 +137,7 @@ export function StudentsOverview() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => navigate(`/faculty/student/${s.id}`)}
-                          className="px-4 py-2 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1d4ed8] transition-colors"
+                          className="px-4 py-2 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1d4ed8] transition-colors whitespace-nowrap"
                         >
                           View Details
                         </button>
