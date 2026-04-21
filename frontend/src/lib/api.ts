@@ -20,6 +20,10 @@ async function request<T>(
   });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.clear();
+      window.location.href = "/";
+    }
     const err = await res.json().catch(() => ({ detail: res.statusText }));
     throw new Error(err.detail || "Request failed");
   }

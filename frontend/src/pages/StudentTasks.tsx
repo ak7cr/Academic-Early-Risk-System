@@ -67,14 +67,14 @@ export function StudentTasks() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Filtered tasks
-  const filteredTasks = filter === "all" ? tasks : tasks.filter((t) => t.status === filter);
+  // Filtered tasks (use effectiveStatus so past-due pending tasks show as overdue)
+  const filteredTasks = filter === "all" ? tasks : tasks.filter((t) => effectiveStatus(t) === filter);
 
   const counts = {
     all: tasks.length,
-    pending: tasks.filter((t) => t.status === "pending").length,
-    completed: tasks.filter((t) => t.status === "completed").length,
-    overdue: tasks.filter((t) => t.status === "overdue").length,
+    pending: tasks.filter((t) => effectiveStatus(t) === "pending").length,
+    completed: tasks.filter((t) => effectiveStatus(t) === "completed").length,
+    overdue: tasks.filter((t) => effectiveStatus(t) === "overdue").length,
   };
 
   // Open add modal
@@ -154,6 +154,11 @@ export function StudentTasks() {
       setError(e?.message || "Failed to delete task.");
       setDeletingId(null);
     }
+  }
+
+  function effectiveStatus(t: Task): string {
+    if (t.status === "pending" && new Date(t.due_date) < new Date()) return "overdue";
+    return t.status;
   }
 
   const statusIcon = (status: string) => {
@@ -253,7 +258,7 @@ export function StudentTasks() {
                       <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                         {filteredTasks.map((t) => (
                           <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
-                            <td className="px-6 py-4 whitespace-nowrap">{statusIcon(t.status)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{statusIcon(effectiveStatus(t))}</td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm font-medium text-gray-900 dark:text-white">{t.title}</div>
                             </td>

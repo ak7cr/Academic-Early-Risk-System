@@ -7,6 +7,7 @@ import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
 import { MetricCard } from "../components/MetricCard";
 import { RiskBadge } from "../components/RiskBadge";
+import { AlertBanner } from "../components/AlertBanner";
 import { useNavigate } from "react-router";
 import { studentsApi, type StudentSummary, type User } from "../lib/api";
 
@@ -57,12 +58,17 @@ export function FacultyDashboard() {
             <MetricCard icon={CheckCircle2} title="Low Risk" value={String(students.filter(s => s.risk_level === "low").length)} description="On track" status="success" />
           </div>
 
-          {/* Student List */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-8">
-            <div className="px-6 py-3 border-b border-gray-100 dark:border-gray-700 grid grid-cols-[1fr_120px_100px_160px_80px_70px_120px] gap-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              <span>Student</span><span>Student ID</span><span>Risk</span><span>Completion</span><span>Missed</span><span>Load</span><span></span>
+          {students.filter(s => s.risk_level === "high").length > 0 && (
+            <div className="mb-8">
+              <AlertBanner
+                message={`${students.filter(s => s.risk_level === "high").length} student${students.filter(s => s.risk_level === "high").length > 1 ? "s are" : " is"} at high risk — immediate intervention recommended.`}
+                type="danger"
+              />
             </div>
-          <div className="divide-y divide-gray-100 dark:divide-gray-700">
+          )}
+
+          {/* Student List */}
+          <div className="space-y-4 mb-8">
             {students.map((student) => (
               <div
                 key={student.id}
@@ -128,7 +134,6 @@ export function FacultyDashboard() {
                 </div>
               </div>
             ))}
-          </div>
           </div>
 
           {/* Quick Action Cards */}

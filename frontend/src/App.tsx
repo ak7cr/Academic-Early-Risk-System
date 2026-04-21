@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import { ThemeProvider } from "./lib/ThemeContext";
 import { RoleSelection } from "./pages/RoleSelection";
 import { StudentDashboard } from "./pages/StudentDashboard";
@@ -17,23 +17,27 @@ import { StudentsOverview } from "./pages/StudentsOverview";
 import { AuthPage } from "./pages/AuthPage";
 import { FacultyPriority } from "./pages/FacultyPriority";
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  return localStorage.getItem("token") ? <>{children}</> : <Navigate to="/" replace />;
+}
+
 const router = createBrowserRouter([
   { path: "/", Component: RoleSelection },
   { path: "/auth/:role", Component: AuthPage },
-  { path: "/student/dashboard", Component: StudentDashboard },
-  { path: "/student/tasks", Component: StudentTasks },
-  { path: "/student/subjects", Component: StudentSubjects },
-  { path: "/student/simulator", Component: StudentSimulator },
-  { path: "/student/recovery", Component: StudentRecovery },
-  { path: "/student/reports", Component: StudentReports },
-  { path: "/student/settings", Component: StudentSettings },
-  { path: "/faculty/dashboard", Component: FacultyDashboard },
-  { path: "/faculty/students", Component: StudentsOverview },
-  { path: "/faculty/analytics", Component: FacultyAnalytics },
-  { path: "/faculty/reports", Component: FacultyReports },
-  { path: "/faculty/settings", Component: FacultySettings },
-  { path: "/faculty/student/:id", Component: StudentDetail },
-    { path: "/faculty/priority", Component: FacultyPriority },
+  { path: "/student/dashboard", element: <RequireAuth><StudentDashboard /></RequireAuth> },
+  { path: "/student/tasks", element: <RequireAuth><StudentTasks /></RequireAuth> },
+  { path: "/student/subjects", element: <RequireAuth><StudentSubjects /></RequireAuth> },
+  { path: "/student/simulator", element: <RequireAuth><StudentSimulator /></RequireAuth> },
+  { path: "/student/recovery", element: <RequireAuth><StudentRecovery /></RequireAuth> },
+  { path: "/student/reports", element: <RequireAuth><StudentReports /></RequireAuth> },
+  { path: "/student/settings", element: <RequireAuth><StudentSettings /></RequireAuth> },
+  { path: "/faculty/dashboard", element: <RequireAuth><FacultyDashboard /></RequireAuth> },
+  { path: "/faculty/students", element: <RequireAuth><StudentsOverview /></RequireAuth> },
+  { path: "/faculty/analytics", element: <RequireAuth><FacultyAnalytics /></RequireAuth> },
+  { path: "/faculty/reports", element: <RequireAuth><FacultyReports /></RequireAuth> },
+  { path: "/faculty/settings", element: <RequireAuth><FacultySettings /></RequireAuth> },
+  { path: "/faculty/student/:id", element: <RequireAuth><StudentDetail /></RequireAuth> },
+  { path: "/faculty/priority", element: <RequireAuth><FacultyPriority /></RequireAuth> },
 ]);
 
 export default function App() {

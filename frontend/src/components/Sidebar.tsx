@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 
 interface SidebarProps {
   role: "student" | "faculty";
@@ -12,6 +12,7 @@ interface SidebarProps {
 
 export function Sidebar({ role, items }: SidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const bgClass =
     role === "student"
@@ -51,15 +52,15 @@ export function Sidebar({ role, items }: SidebarProps) {
 
       {/* Logout */}
       <div className="p-4 border-t border-white/10">
-        <Link
-          to="/"
-          className="flex items-center gap-3 px-4 py-3 rounded-lg w-full hover:bg-white/10 transition-all"
+        <button
+          onClick={() => { localStorage.clear(); navigate("/"); }}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg w-full hover:bg-white/10 transition-all text-left"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           <span>Logout</span>
-        </Link>
+        </button>
       </div>
     </div>
   );

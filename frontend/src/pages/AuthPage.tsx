@@ -67,7 +67,7 @@ export function AuthPage() {
         password: signupPassword,
         name,
         role: isFaculty ? "faculty" : "student",
-        student_id: isFaculty ? idNumber || undefined : idNumber || undefined,
+        ...(isFaculty ? {} : { student_id: idNumber || undefined }),
       };
       const res = await auth.register(payload);
       localStorage.setItem("token", res.access_token);
