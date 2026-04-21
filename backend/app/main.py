@@ -17,6 +17,9 @@ def _init_db():
     if "password_plain" not in user_cols:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE users ADD COLUMN password_plain VARCHAR(256)"))
+    if "faculty_notes" not in user_cols:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN faculty_notes VARCHAR(2000)"))
 
     with engine.begin() as conn:
         conn.execute(text(

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText, Settings,
-  AlertCircle, CheckCircle2, Clock, TrendingUp, Loader2,
+  AlertCircle, CheckCircle2, Clock, TrendingUp, Loader2, Bell,
 } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
@@ -10,7 +10,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
-import { riskApi, subjectsApi, type RiskResult, type TrendPoint, type BacklogPoint, type User } from "../lib/api";
+import { riskApi, subjectsApi, tasksApi, type Task, type RiskResult, type TrendPoint, type BacklogPoint, type User } from "../lib/api";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/student/dashboard" },
@@ -30,6 +30,7 @@ export function StudentDashboard() {
   const [completionTrend, setCompletionTrend] = useState<TrendPoint[]>([]);
   const [riskTrend, setRiskTrend] = useState<TrendPoint[]>([]);
   const [backlogTrend, setBacklogTrend] = useState<BacklogPoint[]>([]);
+  const [dueSoon, setDueSoon] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
@@ -39,13 +40,20 @@ export function StudentDashboard() {
       riskApi.current(),
       subjectsApi.withRisk(),
       riskApi.trends(),
+      tasksApi.list(),
     ])
-      .then(([r, s, t]) => {
+      .then(([r, s, t, tasks]) => {
         setRisk(r);
         setSubjects(s as SubjectWithRisk[]);
         setCompletionTrend(t.completion_trend || []);
         setRiskTrend(t.risk_trend || []);
         setBacklogTrend(t.backlog_trend || []);
+        const in48h = new Date(Date.now() + 48 * 60 * 60 * 1000);
+        setDueSoon(
+          (tasks as Task[]).filter(
+            (t) => t.status === "pending" && new Date(t.due_date) <= in48h && new Date(t.due_date) > new Date()
+          ).sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
+        );
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -69,6 +77,25 @@ export function StudentDashboard() {
             <div className="bg-red-50 dark:bg-red-900/30 text-red-700 rounded-2xl p-6 text-center">{error}</div>
           ) : risk ? (
           <>
+          {/* Due Soon Banner */}
+          {dueSoon.length > 0 && (
+            <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 mb-6 flex items-start gap-3">
+              <Bell className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">
+                  {dueSoon.length} task{dueSoon.length > 1 ? "s" : ""} due within 48 hours
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {dueSoon.map((t) => (
+                    <span key={t.id} className="text-xs bg-amber-100 dark:bg-amber-800/50 text-amber-800 dark:text-amber-300 px-2.5 py-1 rounded-full">
+                      {t.title} · {new Date(t.due_date).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Metric Cards */}
           <div className="grid grid-cols-4 gap-6 mb-8">
             <MetricCard icon={AlertCircle} title="Current Risk Level" value={risk.risk_level.charAt(0).toUpperCase() + risk.risk_level.slice(1)} description={risk.risk_level === "high" ? "Trending Up" : risk.risk_level === "medium" ? "Moderate" : "Stable"} status={risk.risk_level === "high" ? "danger" : risk.risk_level === "medium" ? "warning" : "success"} />

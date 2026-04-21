@@ -14,6 +14,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import { studentsApi, type StudentSummary, type RiskResult, type User } from "../lib/api";
+import { StickyNote } from "lucide-react";
 
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
@@ -48,6 +49,9 @@ export function StudentDetail() {
   const [risk, setRisk] = useState<RiskResult | null>(null);
   const [subjects, setSubjects] = useState<SubjectRiskData[]>([]);
   const [trends, setTrends] = useState<TrendRow[]>([]);
+  const [notes, setNotes] = useState("");
+  const [notesSaving, setNotesSaving] = useState(false);
+  const [notesSaved, setNotesSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const currentUser: User | null = JSON.parse(localStorage.getItem("user") || "null");
@@ -63,6 +67,7 @@ export function StudentDetail() {
     ])
       .then(([s, r, subj, t]) => {
         setStudent(s);
+        setNotes(s.faculty_notes || "");
         setRisk(r);
         setSubjects(subj as SubjectRiskData[]);
         const rows: TrendRow[] = (t.labels || []).map((label, i) => ({
@@ -240,6 +245,37 @@ export function StudentDetail() {
               </ResponsiveContainer>
             </div>
           )}
+
+          {/* Faculty Notes */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <StickyNote className="w-5 h-5 text-gray-400" />
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Faculty Notes</h2>
+            </div>
+            <textarea
+              value={notes}
+              onChange={(e) => { setNotes(e.target.value); setNotesSaved(false); }}
+              rows={4}
+              placeholder="Add private notes about this student…"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="flex items-center justify-between mt-3">
+              {notesSaved && <span className="text-xs text-green-600">Saved</span>}
+              {!notesSaved && <span />}
+              <button
+                disabled={notesSaving}
+                onClick={async () => {
+                  setNotesSaving(true);
+                  await studentsApi.updateNotes(Number(id), notes.trim() || null);
+                  setNotesSaving(false);
+                  setNotesSaved(true);
+                }}
+                className="px-4 py-1.5 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1d4ed8] transition-colors disabled:opacity-60"
+              >
+                {notesSaving ? "Saving…" : "Save Notes"}
+              </button>
+            </div>
+          </div>
 
           {/* Subject Details Table */}
           {subjects.length > 0 && (

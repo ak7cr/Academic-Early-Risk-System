@@ -177,5 +177,10 @@ class StudentSummary(BaseModel):
     missed_deadlines: int
     workload_score: float
     total_tasks: int
+    faculty_notes: str | None = None
 
     model_config = {"from_attributes": True}
+
+
+class NotesUpdate(BaseModel):
+    notes: str | None = None

@@ -171,6 +171,7 @@ export interface StudentSummary {
   missed_deadlines: number;
   workload_score: number;
   total_tasks: number;
+  faculty_notes: string | null;
 }
 
 export const studentsApi = {
@@ -179,6 +180,8 @@ export const studentsApi = {
   risk: (id: number) => api.get<RiskResult>(`/api/students/${id}/risk`),
   trends: (id: number) => api.get<{ labels: string[]; completion: number[]; overdue: number[]; workload: number[] }>(`/api/students/${id}/trends`),
   subjects: (id: number) => api.get<(Subject & { risk_level: string; total_tasks: number; completed_tasks: number; overdue_tasks: number; student_id: number; created_at: string })[]>(`/api/students/${id}/subjects`),
+  updateNotes: (id: number, notes: string | null) =>
+    api.patch<{ faculty_notes: string | null }>(`/api/students/${id}/notes`, { notes }),
 };
 
 // --- Reports ---

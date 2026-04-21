@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import User, UserRole, Task, TaskStatus
-from ..schemas import StudentSummary, RiskResult
+from ..schemas import StudentSummary, RiskResult, NotesUpdate
 from ..auth import require_faculty
 from ..risk_engine import compute_risk, compute_trends, compute_subject_risk, _classify, _as_utc
 
@@ -64,6 +64,7 @@ def list_students(
             missed_deadlines=overdue,
             workload_score=workload,
             total_tasks=total,
+            faculty_notes=s.faculty_notes,
         ))
     return results
 
@@ -98,6 +99,7 @@ def get_student(
         missed_deadlines=overdue,
         workload_score=workload,
         total_tasks=total,
+        faculty_notes=student.faculty_notes,
     )
 
 
@@ -140,6 +142,21 @@ def get_student_trends(
         "overdue": overdue,
         "workload": workload,
     }
+
+
+@router.patch("/{student_id}/notes")
+def update_student_notes(
+    student_id: int,
+    body: NotesUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_faculty),
+):
+    student = db.query(User).filter(User.id == student_id, User.role == UserRole.student).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    student.faculty_notes = body.notes
+    db.commit()
+    return {"faculty_notes": student.faculty_notes}
 
 
 @router.get("/{student_id}/subjects")

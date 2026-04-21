@@ -50,6 +50,7 @@ class User(Base):
     student_id: Mapped[str | None] = mapped_column(String(50), unique=True, nullable=True)
     department: Mapped[str | None] = mapped_column(String(200), nullable=True)
     year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    faculty_notes: Mapped[str | None] = mapped_column(String(2000), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
     pending_sync: Mapped[bool] = mapped_column(Boolean, default=True)
