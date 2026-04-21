@@ -93,8 +93,10 @@ export function TopNavbar({ title, subtitle, userName = "User" }: TopNavbarProps
     const now = new Date();
     const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
 
-    // Overdue tasks
-    const overdueTasks = studentTasks.filter((t) => t.status === "overdue");
+    // Overdue tasks (also catch pending tasks that are past their due date)
+    const overdueTasks = studentTasks.filter(
+      (t) => t.status === "overdue" || (t.status === "pending" && new Date(t.due_date) < now)
+    );
     overdueTasks.forEach((t) => {
       const dueDate = new Date(t.due_date);
       const daysOverdue = Math.floor((now.getTime() - dueDate.getTime()) / (24 * 60 * 60 * 1000));

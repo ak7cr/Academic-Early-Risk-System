@@ -59,6 +59,14 @@ export function FacultySettings() {
           <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Profile</h2>
             <div className="space-y-4">
+              {user?.department && (
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 dark:text-gray-400">Department</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{user.department}</span>
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="text-sm text-gray-500 dark:text-gray-400">Name</label>
                 <input
@@ -103,7 +111,7 @@ export function FacultySettings() {
 
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
-                  onClick={() => { localStorage.clear(); navigate("/"); }}
+                  onClick={() => { const theme = localStorage.getItem("theme"); localStorage.clear(); if (theme) localStorage.setItem("theme", theme); navigate("/"); }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />

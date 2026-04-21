@@ -67,8 +67,18 @@ export function StudentTasks() {
       .finally(() => setLoading(false));
   }, []);
 
+  const STATUS_ORDER: Record<string, number> = { overdue: 0, pending: 1, completed: 2 };
+  function sortedTasks(list: Task[]) {
+    return [...list].sort((a, b) => {
+      const sa = STATUS_ORDER[effectiveStatus(a)] ?? 3;
+      const sb = STATUS_ORDER[effectiveStatus(b)] ?? 3;
+      if (sa !== sb) return sa - sb;
+      return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+    });
+  }
+
   // Filtered tasks (use effectiveStatus so past-due pending tasks show as overdue)
-  const filteredTasks = filter === "all" ? tasks : tasks.filter((t) => effectiveStatus(t) === filter);
+  const filteredTasks = sortedTasks(filter === "all" ? tasks : tasks.filter((t) => effectiveStatus(t) === filter));
 
   const counts = {
     all: tasks.length,
@@ -167,12 +177,7 @@ export function StudentTasks() {
     return <Clock className="w-5 h-5 text-yellow-600" />;
   };
 
-  const statusBadge = (status: string) => {
-    const colors = status === "completed" ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300" : status === "overdue" ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300" : "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300";
-    return <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${colors}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
-  };
-
-  const typeBadge = (type: string) => {
+const typeBadge = (type: string) => {
     return <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">{type.charAt(0).toUpperCase() + type.slice(1)}</span>;
   };
 

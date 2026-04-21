@@ -22,6 +22,8 @@ export function AuthPage() {
   // SignUp fields
   const [name, setName] = useState("");
   const [idNumber, setIdNumber] = useState(""); // Reg No for student, Faculty No for faculty
+  const [department, setDepartment] = useState("");
+  const [year, setYear] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -67,7 +69,13 @@ export function AuthPage() {
         password: signupPassword,
         name,
         role: isFaculty ? "faculty" : "student",
-        ...(isFaculty ? {} : { student_id: idNumber || undefined }),
+        ...(isFaculty
+          ? { department: department.trim() || undefined }
+          : {
+              student_id: idNumber.trim() || undefined,
+              department: department.trim() || undefined,
+              year: year ? Number(year) : undefined,
+            }),
       };
       const res = await auth.register(payload);
       localStorage.setItem("token", res.access_token);
@@ -231,6 +239,34 @@ export function AuthPage() {
                   style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Department</label>
+                <input
+                  type="text"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  placeholder={isFaculty ? "Computer Science" : "Computer Science"}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+                />
+              </div>
+              {!isFaculty && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Year of Study</label>
+                  <select
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-sm bg-white dark:bg-gray-700 dark:text-white"
+                    style={{ "--tw-ring-color": accentColor } as React.CSSProperties}
+                  >
+                    <option value="">Select year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
                 <input

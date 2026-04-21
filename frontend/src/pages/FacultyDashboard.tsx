@@ -68,6 +68,12 @@ export function FacultyDashboard() {
           )}
 
           {/* Student List */}
+          {students.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 shadow-sm text-center mb-8">
+              <Users className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+              <p className="text-gray-500 dark:text-gray-400">No students enrolled yet.</p>
+            </div>
+          ) : (
           <div className="space-y-4 mb-8">
             {students.map((student) => (
               <div
@@ -135,6 +141,7 @@ export function FacultyDashboard() {
               </div>
             ))}
           </div>
+          )}
 
           {/* Quick Action Cards */}
           <div className="grid grid-cols-3 gap-6 mt-8">

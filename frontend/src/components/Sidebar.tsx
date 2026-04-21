@@ -53,7 +53,7 @@ export function Sidebar({ role, items }: SidebarProps) {
       {/* Logout */}
       <div className="p-4 border-t border-white/10">
         <button
-          onClick={() => { localStorage.clear(); navigate("/"); }}
+          onClick={() => { const theme = localStorage.getItem("theme"); localStorage.clear(); if (theme) localStorage.setItem("theme", theme); navigate("/"); }}
           className="flex items-center gap-3 px-4 py-3 rounded-lg w-full hover:bg-white/10 transition-all text-left"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

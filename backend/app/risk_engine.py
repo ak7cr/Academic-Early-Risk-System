@@ -185,8 +185,9 @@ def compute_trends(db: Session, student_id: int, weeks: int = 5) -> dict:
 
     risk_map = {"low": 20, "medium": 50, "high": 85}
 
-    for i, entry in enumerate(history[-weeks:]):
-        label = f"Week {i + 1}" if i < len(history) - 1 else "Current"
+    sliced = history[-weeks:]
+    for i, entry in enumerate(sliced):
+        label = f"Week {i + 1}" if i < len(sliced) - 1 else "Current"
         completion_trend.append({"week": label, "value": entry.completion_rate})
         risk_trend.append({"week": label, "value": risk_map.get(entry.risk_level.value, 50)})
         backlog_trend.append({
