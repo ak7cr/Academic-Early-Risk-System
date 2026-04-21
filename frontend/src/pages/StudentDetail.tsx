@@ -266,9 +266,12 @@ export function StudentDetail() {
                 disabled={notesSaving}
                 onClick={async () => {
                   setNotesSaving(true);
-                  await studentsApi.updateNotes(Number(id), notes.trim() || null);
-                  setNotesSaving(false);
-                  setNotesSaved(true);
+                  try {
+                    await studentsApi.updateNotes(Number(id), notes.trim() || null);
+                    setNotesSaved(true);
+                  } finally {
+                    setNotesSaving(false);
+                  }
                 }}
                 className="px-4 py-1.5 bg-[#2563EB] text-white text-sm font-medium rounded-lg hover:bg-[#1d4ed8] transition-colors disabled:opacity-60"
               >
