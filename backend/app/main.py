@@ -1,4 +1,3 @@
-import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,32 +7,37 @@ from .database import engine, Base, SessionLocal
 from .seed import seed_database
 from .routers import auth, subjects, tasks, risk, students, reports, admin
 
-# Create tables and seed — runs at import time (works for both serverless and uvicorn)
-try:
+
+def _init_db():
     Base.metadata.create_all(bind=engine)
-    # Ensure password_plain column exists (migration for existing DBs)
+
     from sqlalchemy import text, inspect as sa_inspect
-    _insp = sa_inspect(engine)
-    _cols = [c["name"] for c in _insp.get_columns("users")]
-    if "password_plain" not in _cols:
-        with engine.begin() as _conn:
-            _conn.execute(text("ALTER TABLE users ADD COLUMN password_plain VARCHAR(256)"))
-    # Backfill password_plain for existing users
-    with engine.begin() as _conn:
-        _conn.execute(text("UPDATE users SET password_plain = 'faculty123' WHERE role = 'faculty' AND password_plain IS NULL"))
-        _conn.execute(text("UPDATE users SET password_plain = 'student123' WHERE role = 'student' AND password_plain IS NULL"))
-    _db = SessionLocal()
+    insp = sa_inspect(engine)
+    user_cols = [c["name"] for c in insp.get_columns("users")]
+    if "password_plain" not in user_cols:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN password_plain VARCHAR(256)"))
+
+    with engine.begin() as conn:
+        conn.execute(text(
+            "UPDATE users SET password_plain = 'faculty123' "
+            "WHERE role = 'faculty' AND password_plain IS NULL"
+        ))
+        conn.execute(text(
+            "UPDATE users SET password_plain = 'student123' "
+            "WHERE role = 'student' AND password_plain IS NULL"
+        ))
+
+    db = SessionLocal()
     try:
-        seed_database(_db)
+        seed_database(db)
     finally:
-        _db.close()
-except Exception as exc:
-    import logging
-    logging.getLogger(__name__).warning("DB init/seed failed (will retry on first request): %s", exc)
+        db.close()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _init_db()
     yield
 
 
@@ -69,23 +73,3 @@ def health():
         "risk_engine": "active",
         "version": "1.0.0",
     }
-
-
-@app.get("/api/debug")
-def debug():
-    """Temporary endpoint to diagnose Vercel deployment issues."""
-    import importlib
-    info: dict = {"db_url_set": bool(os.environ.get("DATABASE_URL"))}
-    try:
-        import pg8000
-        info["pg8000"] = pg8000.__version__
-    except ImportError as e:
-        info["pg8000_error"] = str(e)
-    try:
-        from .database import engine
-        with engine.connect() as conn:
-            conn.execute(__import__("sqlalchemy").text("SELECT 1"))
-        info["db_connection"] = "ok"
-    except Exception as e:
-        info["db_connection_error"] = str(e)
-    return info

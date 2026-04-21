@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, BarChart3, FileText, Settings,
-  UserCheck, AlertTriangle, TrendingUp, Percent, Loader2,
+  UserCheck, AlertTriangle, TrendingUp, Percent, Loader2, Search, X,
 } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
@@ -14,16 +14,21 @@ import { studentsApi, type StudentSummary, type User } from "../lib/api";
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
   { icon: Users, label: "Students", path: "/faculty/students" },
+  { icon: AlertTriangle, label: "Priority Students", path: "/faculty/priority" },
   { icon: BarChart3, label: "Class Analytics", path: "/faculty/analytics" },
   { icon: FileText, label: "Reports", path: "/faculty/reports" },
   { icon: Settings, label: "Settings", path: "/faculty/settings" },
 ];
+
+type RiskFilter = "all" | "high" | "medium" | "low";
 
 export function StudentsOverview() {
   const navigate = useNavigate();
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [riskFilter, setRiskFilter] = useState<RiskFilter>("all");
   const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
 
   useEffect(() => {
@@ -39,6 +44,13 @@ export function StudentsOverview() {
     ? Math.round(students.reduce((sum, s) => sum + s.completion_rate, 0) / students.length)
     : 0;
   const atRiskPct = students.length > 0 ? Math.round((atRisk / students.length) * 100) : 0;
+
+  const filtered = students.filter((s) => {
+    const matchesRisk = riskFilter === "all" || s.risk_level === riskFilter;
+    const q = search.toLowerCase();
+    const matchesSearch = !q || s.name.toLowerCase().includes(q) || (s.student_id || "").toLowerCase().includes(q) || (s.email || "").toLowerCase().includes(q);
+    return matchesRisk && matchesSearch;
+  });
 
   return (
     <div className="flex h-screen bg-[#F9FAFB] dark:bg-gray-900">
@@ -65,26 +77,65 @@ export function StudentsOverview() {
           </div>
 
           {highRisk > 0 && (
-          <div className="mb-8">
-            <AlertBanner message={`Intervention Required — ${highRisk} student${highRisk > 1 ? "s are" : " is"} at high risk of academic failure. Immediate intervention recommended.`} type="danger" />
-          </div>
+            <div className="mb-8">
+              <AlertBanner message={`Intervention Required — ${highRisk} student${highRisk > 1 ? "s are" : " is"} at high risk of academic failure. Immediate intervention recommended.`} type="danger" />
+            </div>
           )}
 
           {/* Table */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <div>
+            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex-1">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white">Student Risk Overview</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Comprehensive view of all students</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                  Showing {filtered.length} of {students.length} students
+                </p>
               </div>
-              <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700">
-                <option>All Students ({students.length})</option>
-                <option>High Risk</option>
-                <option>Medium Risk</option>
-                <option>Low Risk</option>
-              </select>
+
+              <div className="flex items-center gap-3">
+                {/* Search */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search name or ID…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-9 pr-8 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-48"
+                  />
+                  {search && (
+                    <button onClick={() => setSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2">
+                      <X className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Risk filter */}
+                <select
+                  value={riskFilter}
+                  onChange={(e) => setRiskFilter(e.target.value as RiskFilter)}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                >
+                  <option value="all">All Students ({students.length})</option>
+                  <option value="high">High Risk ({students.filter(s => s.risk_level === "high").length})</option>
+                  <option value="medium">Medium Risk ({students.filter(s => s.risk_level === "medium").length})</option>
+                  <option value="low">Low Risk ({students.filter(s => s.risk_level === "low").length})</option>
+                </select>
+              </div>
             </div>
 
+            {filtered.length === 0 ? (
+              <div className="p-12 text-center">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+                <p className="text-gray-500 dark:text-gray-400">No students match your filters.</p>
+                <button
+                  onClick={() => { setSearch(""); setRiskFilter("all"); }}
+                  className="mt-3 text-sm text-blue-600 hover:underline"
+                >
+                  Clear filters
+                </button>
+              </div>
+            ) : (
             <div className="overflow-x-auto">
               <table className="w-full table-fixed min-w-[980px]">
                 <colgroup>
@@ -104,11 +155,11 @@ export function StudentsOverview() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {students.map((s) => (
+                  {filtered.map((s) => (
                     <tr key={s.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white font-bold">
+                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#6D28D9] to-[#9333EA] flex items-center justify-center text-white font-bold shrink-0">
                             {s.name.charAt(0)}
                           </div>
                           <div className="min-w-0">
@@ -147,6 +198,7 @@ export function StudentsOverview() {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
           </>
           )}

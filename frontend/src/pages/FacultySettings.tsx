@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LayoutDashboard, Users, BarChart3, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, FileText, Settings, AlertTriangle, LogOut } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
 import { auth, type User } from "../lib/api";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router";
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
   { icon: Users, label: "Students", path: "/faculty/students" },
+  { icon: AlertTriangle, label: "Priority Students", path: "/faculty/priority" },
   { icon: BarChart3, label: "Class Analytics", path: "/faculty/analytics" },
   { icon: FileText, label: "Reports", path: "/faculty/reports" },
   { icon: Settings, label: "Settings", path: "/faculty/settings" },
@@ -18,7 +19,7 @@ export function FacultySettings() {
   const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
-  const [role, setRole] = useState<"student" | "faculty">((user?.role as "student" | "faculty") || "faculty");
+
   const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -37,15 +38,11 @@ export function FacultySettings() {
       const updated = await auth.updateMe({
         name: name.trim(),
         email: email.trim(),
-        role,
         ...(password.trim() ? { password: password.trim() } : {}),
       });
       localStorage.setItem("user", JSON.stringify(updated));
       setPassword("");
       setSuccess("Profile updated successfully.");
-      if (updated.role === "student") {
-        navigate("/student/dashboard");
-      }
     } catch (e: any) {
       setError(e?.message || "Failed to update profile.");
     } finally {
@@ -81,17 +78,7 @@ export function FacultySettings() {
                   placeholder="Enter your email"
                 />
               </div>
-              <div>
-                <label className="text-sm text-gray-500 dark:text-gray-400">Role</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as "student" | "faculty")}
-                  className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="faculty">Faculty</option>
-                  <option value="student">Student</option>
-                </select>
-              </div>
+
                 <div>
                   <label className="text-sm text-gray-500 dark:text-gray-400">Password</label>
                   <input
@@ -113,6 +100,16 @@ export function FacultySettings() {
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>
+
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => { localStorage.clear(); navigate("/"); }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log Out
+                </button>
+              </div>
             </div>
           </div>
         </div>

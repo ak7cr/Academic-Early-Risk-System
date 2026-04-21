@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, BarChart3, FileText, Settings,
-  AlertTriangle, Loader2,
+  AlertTriangle, Loader2, TrendingUp, CheckCircle2,
 } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
+import { MetricCard } from "../components/MetricCard";
 import { RiskBadge } from "../components/RiskBadge";
 import { useNavigate } from "react-router";
 import { studentsApi, type StudentSummary, type User } from "../lib/api";
@@ -12,6 +13,7 @@ import { studentsApi, type StudentSummary, type User } from "../lib/api";
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
   { icon: Users, label: "Students", path: "/faculty/students" },
+  { icon: AlertTriangle, label: "Priority Students", path: "/faculty/priority" },
   { icon: BarChart3, label: "Class Analytics", path: "/faculty/analytics" },
   { icon: FileText, label: "Reports", path: "/faculty/reports" },
   { icon: Settings, label: "Settings", path: "/faculty/settings" },
@@ -47,8 +49,20 @@ export function FacultyDashboard() {
             <div className="bg-red-50 dark:bg-red-900/30 text-red-700 rounded-2xl p-6 text-center">{error}</div>
           ) : (
           <>
+          {/* Summary Metrics */}
+          <div className="grid grid-cols-4 gap-6 mb-8">
+            <MetricCard icon={Users} title="Total Students" value={String(students.length)} description="Active enrollments" status="neutral" />
+            <MetricCard icon={AlertTriangle} title="High Risk" value={String(students.filter(s => s.risk_level === "high").length)} description="Immediate attention" status="danger" />
+            <MetricCard icon={TrendingUp} title="Avg Completion" value={`${students.length ? Math.round(students.reduce((a,s) => a + s.completion_rate, 0) / students.length) : 0}%`} description="Class average" status="success" />
+            <MetricCard icon={CheckCircle2} title="Low Risk" value={String(students.filter(s => s.risk_level === "low").length)} description="On track" status="success" />
+          </div>
+
           {/* Student List */}
-          <div className="space-y-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden mb-8">
+            <div className="px-6 py-3 border-b border-gray-100 dark:border-gray-700 grid grid-cols-[1fr_120px_100px_160px_80px_70px_120px] gap-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <span>Student</span><span>Student ID</span><span>Risk</span><span>Completion</span><span>Missed</span><span>Load</span><span></span>
+            </div>
+          <div className="divide-y divide-gray-100 dark:divide-gray-700">
             {students.map((student) => (
               <div
                 key={student.id}
@@ -114,6 +128,7 @@ export function FacultyDashboard() {
                 </div>
               </div>
             ))}
+          </div>
           </div>
 
           {/* Quick Action Cards */}

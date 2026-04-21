@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, ListTodo, BookOpen, Calculator, HeartPulse, FileText, Settings, LogOut } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
 import { auth, type User } from "../lib/api";
@@ -20,7 +20,7 @@ export function StudentSettings() {
   const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
-  const [role, setRole] = useState<"student" | "faculty">((user?.role as "student" | "faculty") || "student");
+
   const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -39,15 +39,11 @@ export function StudentSettings() {
       const updated = await auth.updateMe({
         name: name.trim(),
         email: email.trim(),
-        role,
         ...(password.trim() ? { password: password.trim() } : {}),
       });
       localStorage.setItem("user", JSON.stringify(updated));
       setPassword("");
       setSuccess("Profile updated successfully.");
-      if (updated.role === "faculty") {
-        navigate("/faculty/dashboard");
-      }
     } catch (e: any) {
       setError(e?.message || "Failed to update profile.");
     } finally {
@@ -83,17 +79,7 @@ export function StudentSettings() {
                   placeholder="Enter your email"
                 />
               </div>
-              <div>
-                <label className="text-sm text-gray-500 dark:text-gray-400">Role</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as "student" | "faculty")}
-                  className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="student">Student</option>
-                  <option value="faculty">Faculty</option>
-                </select>
-              </div>
+
               <div>
                 <label className="text-sm text-gray-500 dark:text-gray-400">Password</label>
                 <input
@@ -115,6 +101,16 @@ export function StudentSettings() {
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>
+
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => { localStorage.clear(); navigate("/"); }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log Out
+                </button>
+              </div>
             </div>
           </div>
         </div>

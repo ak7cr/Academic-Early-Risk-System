@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 
 
 def _task_to_out(task: Task) -> dict:
-    d = {
+    return {
         "id": task.id,
         "title": task.title,
         "subject_id": task.subject_id,
@@ -26,7 +26,6 @@ def _task_to_out(task: Task) -> dict:
         "subject_code": task.subject.code if task.subject else None,
         "subject_name": task.subject.name if task.subject else None,
     }
-    return d
 
 
 @router.get("", response_model=list[TaskOut])
@@ -38,8 +37,7 @@ def list_tasks(
     q = db.query(Task).filter(Task.student_id == current_user.id)
     if status:
         q = q.filter(Task.status == TaskStatus(status))
-    tasks = q.order_by(Task.due_date).all()
-    return [_task_to_out(t) for t in tasks]
+    return [_task_to_out(t) for t in q.order_by(Task.due_date).all()]
 
 
 @router.post("", response_model=TaskOut)

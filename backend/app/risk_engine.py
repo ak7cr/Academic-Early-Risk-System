@@ -18,6 +18,13 @@ from sqlalchemy.orm import Session
 from .models import Task, TaskStatus, RiskLevel, RiskHistory, User
 
 
+def _as_utc(dt: datetime) -> datetime:
+    """SQLite drops tzinfo on read; re-attach UTC so comparisons don't crash."""
+    if dt is not None and dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
 def compute_risk(db: Session, student_id: int) -> dict:
     """Compute current risk for a student and persist to history."""
     tasks = db.query(Task).filter(Task.student_id == student_id).all()
@@ -25,7 +32,7 @@ def compute_risk(db: Session, student_id: int) -> dict:
 
     # Auto-mark overdue tasks
     for t in tasks:
-        if t.status == TaskStatus.pending and t.due_date < now:
+        if t.status == TaskStatus.pending and _as_utc(t.due_date) < now:
             t.status = TaskStatus.overdue
     db.flush()
 
@@ -49,15 +56,25 @@ def compute_risk(db: Session, student_id: int) -> dict:
     explanation = _build_explanation(overdue, completion_rate, workload_score, total, completed)
     recommendations = _build_recommendations(risk_level, overdue, completion_rate, pending)
 
-    # Persist to history
-    entry = RiskHistory(
-        student_id=student_id,
-        risk_level=risk_level,
-        completion_rate=round(completion_rate, 1),
-        overdue_tasks=overdue,
-        workload_score=workload_score,
+    # Persist to history at most once per hour, or when risk level changes.
+    last = (
+        db.query(RiskHistory)
+        .filter(RiskHistory.student_id == student_id)
+        .order_by(RiskHistory.computed_at.desc())
+        .first()
     )
-    db.add(entry)
+    if (
+        not last
+        or last.risk_level != risk_level
+        or (now - _as_utc(last.computed_at)).total_seconds() > 3600
+    ):
+        db.add(RiskHistory(
+            student_id=student_id,
+            risk_level=risk_level,
+            completion_rate=round(completion_rate, 1),
+            overdue_tasks=overdue,
+            workload_score=workload_score,
+        ))
     db.commit()
 
     return {
@@ -186,20 +203,39 @@ def compute_trends(db: Session, student_id: int, weeks: int = 5) -> dict:
 
 
 def compute_subject_risk(db: Session, student_id: int) -> list[dict]:
-    """Compute per-subject risk levels."""
+    """Compute per-subject risk levels using two queries instead of N+1."""
+    from sqlalchemy import func, case, and_
     from .models import Subject
-    subjects = db.query(Subject).filter(Subject.student_id == student_id).all()
+
     now = datetime.now(timezone.utc)
+    subjects = db.query(Subject).filter(Subject.student_id == student_id).all()
+    if not subjects:
+        return []
+
+    subject_ids = [s.id for s in subjects]
+
+    # Single aggregation query for all subjects at once.
+    stats = db.query(
+        Task.subject_id,
+        func.count(Task.id).label("total"),
+        func.sum(case((Task.status == TaskStatus.completed, 1), else_=0)).label("completed"),
+        func.sum(case(
+            (Task.status == TaskStatus.overdue, 1),
+            else_=case(
+                (and_(Task.status == TaskStatus.pending, Task.due_date < now), 1),
+                else_=0,
+            ),
+        )).label("overdue"),
+    ).filter(Task.subject_id.in_(subject_ids)).group_by(Task.subject_id).all()
+
+    stats_map = {row.subject_id: row for row in stats}
     results = []
-
     for subj in subjects:
-        tasks = db.query(Task).filter(Task.subject_id == subj.id).all()
-        total = len(tasks)
-        completed = sum(1 for t in tasks if t.status == TaskStatus.completed)
-        overdue = sum(1 for t in tasks if t.status == TaskStatus.overdue or (t.status == TaskStatus.pending and t.due_date < now))
+        row = stats_map.get(subj.id)
+        total = row.total if row else 0
+        completed = row.completed if row else 0
+        overdue = row.overdue if row else 0
         rate = (completed / total * 100) if total > 0 else 100.0
-        risk = _classify(overdue, rate)
-
         results.append({
             "id": subj.id,
             "code": subj.code,
@@ -207,7 +243,7 @@ def compute_subject_risk(db: Session, student_id: int) -> list[dict]:
             "semester": subj.semester,
             "student_id": subj.student_id,
             "created_at": subj.created_at,
-            "risk_level": risk.value,
+            "risk_level": _classify(overdue, rate).value,
             "total_tasks": total,
             "completed_tasks": completed,
             "overdue_tasks": overdue,

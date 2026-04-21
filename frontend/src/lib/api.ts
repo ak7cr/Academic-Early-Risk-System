@@ -149,7 +149,7 @@ export const tasksApi = {
     due_date: string;
     estimated_hours?: number;
   }) => api.post<Task>("/api/tasks", data),
-  update: (id: number, data: { status?: string; title?: string }) =>
+  update: (id: number, data: { status?: string; title?: string; due_date?: string; estimated_hours?: number }) =>
     api.patch<Task>(`/api/tasks/${id}`, data),
   delete: (id: number) => api.delete<void>(`/api/tasks/${id}`),
 };

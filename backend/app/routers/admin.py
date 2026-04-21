@@ -13,9 +13,10 @@ from ..database import get_db
 from ..models import User, Subject, Task, RiskHistory
 from ..auth import hash_password
 
+import os
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
-ADMIN_PASSWORD = "0000"
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "0000")
 
 
 def _verify_password(x_admin_password: str = Header(...)):

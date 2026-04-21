@@ -8,6 +8,7 @@ import { useNavigate } from "react-router";
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
   { icon: Users, label: "Students", path: "/faculty/students" },
+  { icon: AlertTriangle, label: "Priority Students", path: "/faculty/priority" },
   { icon: BarChart3, label: "Class Analytics", path: "/faculty/analytics" },
   { icon: FileText, label: "Reports", path: "/faculty/reports" },
   { icon: Settings, label: "Settings", path: "/faculty/settings" },

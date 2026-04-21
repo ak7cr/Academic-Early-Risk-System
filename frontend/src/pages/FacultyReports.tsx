@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Users, BarChart3, FileText, Settings, Loader2, Download, Printer } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, FileText, Settings, Loader2, Download, Printer, AlertTriangle } from "lucide-react";
 import { Sidebar } from "../components/Sidebar";
 import { TopNavbar } from "../components/TopNavbar";
 import { studentsApi, reportsApi, type StudentSummary, type WeeklyReport, type User } from "../lib/api";
@@ -7,6 +7,7 @@ import { studentsApi, reportsApi, type StudentSummary, type WeeklyReport, type U
 const facultySidebar = [
   { icon: LayoutDashboard, label: "Overview", path: "/faculty/dashboard" },
   { icon: Users, label: "Students", path: "/faculty/students" },
+  { icon: AlertTriangle, label: "Priority Students", path: "/faculty/priority" },
   { icon: BarChart3, label: "Class Analytics", path: "/faculty/analytics" },
   { icon: FileText, label: "Reports", path: "/faculty/reports" },
   { icon: Settings, label: "Settings", path: "/faculty/settings" },
@@ -15,6 +16,7 @@ const facultySidebar = [
 export function FacultyReports() {
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [reports, setReports] = useState<Record<number, WeeklyReport>>({});
+  const [failedIds, setFailedIds] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const user: User | null = JSON.parse(localStorage.getItem("user") || "null");
@@ -25,12 +27,16 @@ export function FacultyReports() {
       .then(async (list) => {
         setStudents(list);
         const reportMap: Record<number, WeeklyReport> = {};
+        const failed = new Set<number>();
         await Promise.all(list.map(async (s) => {
           try {
             reportMap[s.id] = await reportsApi.studentWeekly(s.id);
-          } catch { /* skip */ }
+          } catch {
+            failed.add(s.id);
+          }
         }));
         setReports(reportMap);
+        setFailedIds(failed);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -152,7 +158,10 @@ export function FacultyReports() {
               <div className="space-y-4">
                 {/* Action Bar */}
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{students.length} students · {Object.keys(reports).length} reports generated</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {students.length} students · {Object.keys(reports).length} reports generated
+                  {failedIds.size > 0 && <span className="ml-2 text-red-500">· {failedIds.size} failed to load</span>}
+                </p>
                   <div className="flex gap-3">
                     <button
                       onClick={exportCSV}
@@ -210,6 +219,8 @@ export function FacultyReports() {
                           </div>
                         )}
                       </div>
+                    ) : failedIds.has(s.id) ? (
+                      <p className="text-sm text-red-400 dark:text-red-500">Failed to load report data</p>
                     ) : (
                       <p className="text-sm text-gray-400 dark:text-gray-500">No report data available</p>
                     )}

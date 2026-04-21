@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models import User, UserRole, Task, TaskStatus
 from ..schemas import WeeklyReport
 from ..auth import get_current_user, require_faculty
-from ..risk_engine import _classify, _build_recommendations
+from ..risk_engine import _classify, _build_recommendations, _as_utc
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 
@@ -19,7 +19,7 @@ def _generate_report(db: Session, student: User) -> WeeklyReport:
     tasks = db.query(Task).filter(Task.student_id == student.id).all()
     total = len(tasks)
     completed = sum(1 for t in tasks if t.status == TaskStatus.completed)
-    overdue = sum(1 for t in tasks if t.status == TaskStatus.overdue)
+    overdue = sum(1 for t in tasks if t.status == TaskStatus.overdue or (t.status == TaskStatus.pending and _as_utc(t.due_date) < now))
     pending = total - completed - overdue
     rate = (completed / total * 100) if total > 0 else 100.0
     workload = min(10.0, round(((overdue * 2 + pending) / total) * 10, 1)) if total > 0 else 0.0
